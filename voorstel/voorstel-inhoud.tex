@@ -15,37 +15,41 @@
 \section{Inleiding}%
 \label{sec:inleiding}
 
-Waarover zal je bachelorproef gaan? Introduceer het thema en zorg dat volgende zaken zeker duidelijk aanwezig zijn:
+Binnen de richting IT infrastructure engineer wordt in HOGENT gebruikgemaakt van verschillende provisioningtools om virtuele Windows- en Linuxomgevingen op te zetten. Een tool dat hierbij veel gebruikt wordt is Vagrant, studenten gebruiken dit om een ontwikkel- en labo-omgeving te kunnen automatiseren op basis van een declaratieve configuratiefile. In de praktijk komen er verschillende problemen tevoorschijn: de virtuele machines starten soms traag op, het provisioningproces hangt vast of kan niet gestart worden door time-outs, virtuele machines kunnen onverwachte kernel panics vertonen en als het provisioningproces onderbroken wordt tijdens uitvoer blijft het soms verder draaien op de achtergrond waardoor dat de gebruiker dit proces manueel moet stoppen om verder te kunnen werken. Dit zorgt voor vele frustraties en tijdverlies zowel binnen een onderwijscontext of bedrijfscontext. 
 
+De centrale onderzoeksvraag van deze bachelorproef is: ``Hoe ontwerp en realiseer je een preformante provisioner voor een virtuele Windows- en Linux omgevingen, die dat beter inspeelt op de behoeften van onderwijs en bedrijven dan de huidige Vagrant-gebaseerde aanpak?'' Om deze vraag te beantwoorden doen we aan de hand van deze deelvragen:
 \begin{itemize}
-  \item kaderen thema
-  \item de doelgroep
-  \item de probleemstelling en (centrale) onderzoeksvraag
-  \item de onderzoeksdoelstelling
+  \item Welke programmeertaal is het meest geschikt om een provisioner te schrijven? 
+  \item Welke functionaliteiten zijn nodig voor een provisioner?
+  \item Op welke besturingssystemen zal de provisioner gebruikt worden?
+  \item Met welke virtualisatie software zouden we het beste compatibiliteit bieden?
 \end{itemize}
 
-Denk er aan: een typische bachelorproef is \textit{toegepast onderzoek}, wat betekent dat je start vanuit een concrete probleemsituatie in bedrijfscontext, een \textbf{casus}. Het is belangrijk om je onderwerp goed af te bakenen: je gaat voor die \textit{ene specifieke probleemsituatie} op zoek naar een goede oplossing, op basis van de huidige kennis in het vakgebied.
+Dit onderzoek streeft ervoor om een provisioner te maken die dat gebruikt kan worden door IT-professionals en studenten binnen een onderwijs- en labo-omgevingen. 
 
-De doelgroep moet ook concreet en duidelijk zijn, dus geen algemene of vaag gedefinieerde groepen zoals \emph{bedrijven}, \emph{developers}, \emph{Vlamingen}, enz. Je richt je in elk geval op it-professionals, een bachelorproef is geen populariserende tekst. Eén specifiek bedrijf (die te maken hebben met een concrete probleemsituatie) is dus beter dan \emph{bedrijven} in het algemeen.
-
-Formuleer duidelijk de onderzoeksvraag! De begeleiders lezen nog steeds te veel voorstellen waarin we geen onderzoeksvraag terugvinden.
-
-Schrijf ook iets over de doelstelling. Wat zie je als het concrete eindresultaat van je onderzoek, naast de uitgeschreven scriptie? Is het een proof-of-concept, een rapport met aanbevelingen, \ldots Met welk eindresultaat kan je je bachelorproef als een succes beschouwen?
 
 %---------- Stand van zaken ---------------------------------------------------
 
 \section{Literatuurstudie}%
 \label{sec:literatuurstudie}
 
-Hier beschrijf je de \emph{state-of-the-art} rondom je gekozen onderzoeksdomein, d.w.z.\ een inleidende, doorlopende tekst over het onderzoeksdomein van je bachelorproef. Je steunt daarbij heel sterk op de professionele \emph{vakliteratuur}, en niet zozeer op populariserende teksten voor een breed publiek. Wat is de huidige stand van zaken in dit domein, en wat zijn nog eventuele open vragen (die misschien de aanleiding waren tot je onderzoeksvraag!)?
 
-Je mag de titel van deze sectie ook aanpassen (literatuurstudie, stand van zaken, enz.). Zijn er al gelijkaardige onderzoeken gevoerd? Wat concluderen ze? Wat is het verschil met jouw onderzoek?
+Virtuele machines vormen de basis van veel Informaticatoepassingen. De voornaamste reden hiervoor is omdat ze het mogelijk maken om meerdere virtuele omgevingen te laten draaien op dezelfde fysieke hardware en zo de flexibiliteit, schaalbaarheid en resource-efficiëntie verhogen.\autocite{Ahmed2020} In verschillende surveys wordt \emph{provisioning} beschreven als het geautomatiseerd aanmaken, configureren en beheren van een virtuele machine.\autocite{Kirana2018,Abdulhamid2014} Zoals deze studies aangeven is het opzetten van een testomgeving met efficiënte provisioning-strategieën cruciaal bij het uitwerken van een project.
 
-Verwijs bij elke introductie van een term of bewering over het domein naar de vakliteratuur, bijvoorbeeld~\autocite{Hykes2013}! Denk zeker goed na welke werken je refereert en waarom.
+\subsection {Infrastructure as Code}
+Het automatiseringsproces wordt in systeembeheer genoemd \emph{Infrastructure as Code (IaC)}. Verschillende studies en rapporten binnen het IaC een maken onderscheid tussen verschillende soorten tools, zoals emph{provisioning tools}, \emph{configuration management} en \emph{orchestration} \autocite{Hill2015,Yevgeniy2025}. Provisioningtools  richten zich op het creëren van de infrastructuur, configuratiemanagement tools richten zich op de installatie en configuratie van software op de server \autocite{Ijaz2024}. 
 
-Draag zorg voor correcte literatuurverwijzingen! Een bronvermelding hoort thuis \emph{binnen} de zin waar je je op die bron baseert, dus niet er buiten! Maak meteen een verwijzing als je gebruik maakt van een bron. Doe dit dus \emph{niet} aan het einde van een lange paragraaf. Baseer nooit teveel aansluitende tekst op eenzelfde bron.
+Het landschap van deze verschillende tools is divers. Voor de lokale ontwikkelingsomgevingen wordt gebruikt gemaakt van tools zoals Vagrant. Verschillende tools bestaan ook die dat niet gemaakt zijn als eerste instantie voor lokale omgevingen zoals Ansible en Terraform, deze worden vaak geassocieerd met cloud omgevingen of grote configuraties \autocite{Ismailzai2017}. Recent vergelijkingen tussen deze verschillende soorten tools toont aan dat de grenzen soms vervagen, de keuze voor een specifiek tool hangt af van de use-cases \autocite{Slattery2025}.
 
-Als je informatie over bronnen verzamelt in JabRef, zorg er dan voor dat alle nodige info aanwezig is om de bron terug te vinden (zoals uitvoerig besproken in de lessen Research Methods).
+
+\subsection{Educatieve context}
+Alhoewel dat er veel verschillende commerciële oplossingen bestaan voor enterprise-\\omgevingen \autocite{Portworx2025}, is er binnen een onderwijscontext andere verschillende eisen voor virtualisatie. Onderzoek naar het gebruik van virtuele machines (VM's) in het onderwijs toont dat een balans tussen performantie, gebruiksvriendelijkheid voor studenten en de beperkingen van consumenten hardware zoals laptops een complexe uitdaging is \autocite{Robison2012}.
+
+Ook speelt tijd een grote rol. De \emph{provisioning time}, de tijd die tussen het aanvragen van de vm en beschikbaarheid ervan is kritieke performance-indicator (KPI) die dat productiviteit beïnvloed \autocite{KpiDepot2024}. Lange provisioning time kan tijdens het maken van een labo of examen voor minder werktijd zorgen. Gelukkig zijn er wel verschillende algoritmen die dat dit kunnen versnellen \autocite{jcai2020p208,Lo2014}, blijft de vraag bestaan hoe je een lichtgewichte en snelle provisioner kan gerealiseerd worden die dat specifiek gemaakt is voor Windows- en Linux-omgevingen voor een educatieve omgeving als alternatief voor de huidige Vagrant provisioner.
+
+
+
+
 
 % Voor literatuurverwijzingen zijn er twee belangrijke commando's:
 % \autocite{KEY} => (Auteur, jaartal) Gebruik dit als de naam van de auteur
@@ -54,31 +58,52 @@ Als je informatie over bronnen verzamelt in JabRef, zorg er dan voor dat alle no
 %   functie heeft in de zin (bv. ``Uit onderzoek door Doll & Hill (1954) bleek
 %   ...'')
 
-Je mag deze sectie nog verder onderverdelen in subsecties als dit de structuur van de tekst kan verduidelijken.
-
 %---------- Methodologie ------------------------------------------------------
 \section{Methodologie}%
 \label{sec:methodologie}
 
-Hier beschrijf je hoe je van plan bent het onderzoek te voeren. Welke onderzoekstechniek ga je toepassen om elk van je onderzoeksvragen te beantwoorden? Gebruik je hiervoor literatuurstudie, interviews met belanghebbenden (bv.~voor requirements-analyse), experimenten, simulaties, vergelijkende studie, risico-analyse, PoC, \ldots?
 
-Valt je onderwerp onder één van de typische soorten bachelorproeven die besproken zijn in de lessen Research Methods (bv.\ vergelijkende studie of risico-analyse)? Zorg er dan ook voor dat we duidelijk de verschillende stappen terug vinden die we verwachten in dit soort onderzoek!
 
-Vermijd onderzoekstechnieken die geen objectieve, meetbare resultaten kunnen opleveren. Enquêtes, bijvoorbeeld, zijn voor een bachelorproef informatica meestal \textbf{niet geschikt}. De antwoorden zijn eerder meningen dan feiten en in de praktijk blijkt het ook bijzonder moeilijk om voldoende respondenten te vinden. Studenten die een enquête willen voeren, hebben meestal ook geen goede definitie van de populatie, waardoor ook niet kan aangetoond worden dat eventuele resultaten representatief zijn.
 
-Uit dit onderdeel moet duidelijk naar voor komen dat je bachelorproef ook technisch voldoen\-de diepgang zal bevatten. Het zou niet kloppen als een bachelorproef informatica ook door bv.\ een student marketing zou kunnen uitgevoerd worden.
+\subsection{Fase 1: Vereisten verzamelen}
+In de eerste fase worden de functionele en niet-functionele requirements in kaart gebracht, dit zal gedaan worden op basis van de huidige problemen met Vagrant en de vereisten van onderwijs en testomgevingen. Hierbij zal bepaald worden welke besturingssystemen we zullen ondersteunen voor het opzetten van de virtuele omgeving, welke virtualisatie software relevant is en welke programmeertaal dat het meest optimaal zou zijn voor het schrijven van een provisioner.
 
-Je beschrijft ook al welke tools (hardware, software, diensten, \ldots) je denkt hiervoor te gebruiken of te ontwikkelen.
+\subsection{Fase 2: Programmeertaal bestuderen}
+In de tweede fase wordt de focus gelegd op het aanleren van de gekozen programmeertaal. Hierbij zullen de basisconcepten van de taal geleerd worden, zoals functies,methodes,datatypes en algemene syntax. Aan de hand van verschillende kleine projecten worden deze concepten dan toegepast en aangeleerd.
 
-Probeer ook een tijdschatting te maken. Hoe lang zal je met elke fase van je onderzoek bezig zijn en wat zijn de concrete \emph{deliverables} in elke fase?
+\subsection{Fase 3: Programmeren van de software}
+In de derde fase wordt de provisioner ontwikkeld op basis van de verzamelde vereisten. In het begin zullen de kernfunctionaliteiten worden geïmplementeerd, zoals het opstarten van de virtuele machines, het lezen van de configuratiefiles en het uitvoeren van de provisioning scripts. Daarna zullen verschillende extra functionaliteiten toegevoegd worden, ook zal er foutafhandeling en logging komen zodat de tool stabiel kan functioneren.
+
+\subsection{Fase 4: Testen}
+In de vierde fase wordt de provisioning software getest aan de hand van verschillende scenario's, hierbij zal de software getest worden op normaal- en grensgebruik. Tijdens deze testen zal op een objectieve manier zoals opstarttijd, totale provisioningtijd, aantal fouten en de noodzaak tot manuele interventie gemeten worden, zodat duidelijk wordt in welke mate de software robuust en betrouwbaar functioneert.
+
+
+\subsection{Fase 5: Rapportering}
+In de vijfde fase worden resultaten van de testen verwerkt in de bachelorproef en andere bijhorende documentatie. Ook zal er een gebruikshandleiding geschreven worden die dat gebruikers kunnen gebruiken.
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\textwidth]{img/Gantt Diagram.png}
+    \caption{\label{fig:gantt}Gantt diagram met de verschillende fasen en milestones van het onderzoek.}
+\end{figure*}
+\newpage
+\subsection{Planning}
+De totale duur van deze methodologie is gepland over een periode van 12 weken.
+\begin{itemize}
+    \item Week 1: Vereisten verzamelen
+    \item Week 2-3: Leren van programmeer taal
+    \item Week 4-9: Programmeren
+    \item Week 10: Testen
+    \item Week 11-12: opstellen rapportering
+\end{itemize}
+
 
 %---------- Verwachte resultaten ----------------------------------------------
 \section{Verwacht resultaat, conclusie}%
 \label{sec:verwachte_resultaten}
+In dit onderzoek wordt er verwacht dat de ontwikkelde provisioner virtuele omgevingen van Windows en Linux kan opbouwen op een snellere en betrouwbaardere manier dan de huidige Vagrant provisioner. Dat de verkorte provisioningtijd,minder mislukte runs en verlaagde manuele interventie er voor zorgt dat de virtuele omgeving betrouwbaarder opstart.
 
-Hier beschrijf je welke resultaten je verwacht. Als je metingen en simulaties uitvoert, kan je hier al mock-ups maken van de grafieken samen met de verwachte conclusies. Benoem zeker al je assen en de onderdelen van de grafiek die je gaat gebruiken. Dit zorgt ervoor dat je concreet weet welk soort data je moet verzamelen en hoe je die moet meten.
+Voor de doelgroep, opleidingen die dat gebruik maken van provisioning, betekent dit dat lessen, oefeningen en projecten minder tijdverlies hebben door technische problemen. De bachelorproef zal niet alleen maar een proef-of-\\concept provisioner maken maar ook documentatie en een handleiding voor mogelijkheid van uitbreiding
 
-Wat heeft de doelgroep van je onderzoek aan het resultaat? Op welke manier zorgt jouw bachelorproef voor een meerwaarde?
 
-Hier beschrijf je wat je verwacht uit je onderzoek, met de motivatie waarom. Het is \textbf{niet} erg indien uit je onderzoek andere resultaten en conclusies vloeien dan dat je hier beschrijft: het is dan juist interessant om te onderzoeken waarom jouw hypothesen niet overeenkomen met de resultaten.
 
