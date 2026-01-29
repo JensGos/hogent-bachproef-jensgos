@@ -15,18 +15,20 @@
 \section{Inleiding}%
 \label{sec:inleiding}
 
-Binnen de richting IT infrastructure engineer wordt in HOGENT gebruikgemaakt van verschillende provisioningtools om virtuele Windows- en Linuxomgevingen op te zetten. Een tool dat hierbij veel gebruikt wordt is Vagrant, studenten gebruiken dit om een ontwikkel- en labo-omgeving te kunnen automatiseren op basis van een declaratieve configuratiefile. In de praktijk komen er verschillende problemen tevoorschijn: de virtuele machines starten soms traag op, het provisioningproces hangt vast of kan niet gestart worden door time-outs, virtuele machines kunnen onverwachte kernel panics vertonen en als het provisioningproces onderbroken wordt tijdens uitvoer blijft het soms verder draaien op de achtergrond waardoor dat de gebruiker dit proces manueel moet stoppen om verder te kunnen werken. Dit zorgt voor vele frustraties en tijdverlies zowel binnen een onderwijscontext of bedrijfscontext. 
+Binnen de richting IT infrastructure engineer wordt in HOGENT gebruikgemaakt van verschillende provisioningtools om virtuele Windows- en Linuxomgevingen op te zetten. Een veel gebruikt tool hiervoor is Vagrant, studenten gebruiken dit om een ontwikkel- en labo-omgeving te kunnen automatiseren op basis van een declaratieve configuratiefile.
 
-De centrale onderzoeksvraag van deze bachelorproef is: ``Hoe ontwerp en realiseer je een preformante provisioner voor een virtuele Windows- en Linux omgevingen, die dat beter inspeelt op de behoeften van onderwijs en bedrijven dan de huidige Vagrant-gebaseerde aanpak?'' Om deze vraag te beantwoorden doen we aan de hand van deze deelvragen:
+In de praktijk komen er verschillende problemen tevoorschijn: de virtuele machines starten soms traag op, het provisioningproces hangt vast of kan niet gestart worden door time-outs, virtuele machines kunnen onverwachte kernel panics vertonen en als het provisioningproces onderbroken wordt tijdens uitvoer blijft het soms verder draaien op de achtergrond waardoor de gebruiker dit proces manueel moet stoppen om verder te kunnen werken. Dit zorgt voor vele frustraties en tijdverlies zowel binnen een onderwijscontext of bedrijfscontext. 
+
+De centrale onderzoeksvraag van deze bachelorproef is: ``Hoe ontwerp en realiseer je een performante provisioner voor een virtuele Windows- en Linux omgevingen, die beter inspeelt op de behoeften van onderwijs en bedrijven dan de huidige Vagrant-gebaseerde aanpak?'' Om deze vraag te beantwoorden doen we aan de hand van deze deelvragen:
 \begin{itemize}
-  \item Welke programmeertaal is het meest geschikt om een provisioner te schrijven? 
   \item Welke functionaliteiten zijn nodig voor een provisioner?
   \item Op welke besturingssystemen zal de provisioner gebruikt worden?
-  \item Met welke virtualisatie software zouden we het beste compatibiliteit bieden?
+  \item Voor welke gast-besturingssystemen provisioned de tool?
 \end{itemize}
 
-Dit onderzoek streeft ervoor om een provisioner te maken die dat gebruikt kan worden door IT-professionals en studenten binnen een onderwijs- en labo-omgevingen. 
+Dit onderzoek streeft ervoor om een provisioner te maken die gebruikt kan worden door IT-professionals en studenten binnen een onderwijs- en labo-omgevingen. 
 
+Om deze vragen te beantwoorden wordt een  sprint-aanpak gebruikt, dit loopt over 12 weken: eerst studeren van de programmeertaal Rust,daarna stapsgewijs het kunnen opstarten van de Virtuele Machine, Provisioning via SSH, Configuratie via TOML, snapshots en foutafhandeling implementeren. Elke sprint bouwt verder op de vorige en zal getest worden aan de hand van testscenario's die gebaseerd zijn op HOGENT labo oefeningen
 
 %---------- Stand van zaken ---------------------------------------------------
 
@@ -34,7 +36,10 @@ Dit onderzoek streeft ervoor om een provisioner te maken die dat gebruikt kan wo
 \label{sec:literatuurstudie}
 
 
-Virtuele machines vormen de basis van veel Informaticatoepassingen. De voornaamste reden hiervoor is omdat ze het mogelijk maken om meerdere virtuele omgevingen te laten draaien op dezelfde fysieke hardware en zo de flexibiliteit, schaalbaarheid en resource-efficiëntie verhogen.\autocite{Ahmed2020} In verschillende surveys wordt \emph{provisioning} beschreven als het geautomatiseerd aanmaken, configureren en beheren van een virtuele machine.\autocite{Kirana2018,Abdulhamid2014} Zoals deze studies aangeven is het opzetten van een testomgeving met efficiënte provisioning-strategieën cruciaal bij het uitwerken van een project.
+Virtuele machines vormen de basis van veel Informaticatoepassingen. De voornaamste reden hiervoor is omdat ze het mogelijk maken om meerdere virtuele omgevingen te laten draaien op dezelfde fysieke hardware en zo de flexibiliteit, schaalbaarheid en resource-efficiëntie verhogen\autocite{Ahmed2020}. In verschillende surveys wordt \emph{provisioning} beschreven als het geautomatiseerd aanmaken, configureren en beheren van een virtuele machine\autocite{Kirana2018,Abdulhamid2014}. Zoals deze studies aangeven is het opzetten van een testomgeving met efficiënte provisioning-strategieën cruciaal bij het uitwerken van een project.
+
+
+
 
 \subsection {Infrastructure as Code}
 Het automatiseringsproces wordt in systeembeheer genoemd \emph{Infrastructure as Code (IaC)}. Verschillende studies en rapporten binnen het IaC een maken onderscheid tussen verschillende soorten tools, zoals emph{provisioning tools}, \emph{configuration management} en \emph{orchestration} \autocite{Hill2015,Yevgeniy2025}. Provisioningtools  richten zich op het creëren van de infrastructuur, configuratiemanagement tools richten zich op de installatie en configuratie van software op de server \autocite{Ijaz2024}. 
@@ -48,8 +53,8 @@ Alhoewel dat er veel verschillende commerciële oplossingen bestaan voor enterpr
 Ook speelt tijd een grote rol. De \emph{provisioning time}, de tijd die tussen het aanvragen van de vm en beschikbaarheid ervan is kritieke performance-indicator (KPI) die dat productiviteit beïnvloed \autocite{KpiDepot2024}. Lange provisioning time kan tijdens het maken van een labo of examen voor minder werktijd zorgen. Gelukkig zijn er wel verschillende algoritmen die dat dit kunnen versnellen \autocite{jcai2020p208,Lo2014}, blijft de vraag bestaan hoe je een lichtgewichte en snelle provisioner kan gerealiseerd worden die dat specifiek gemaakt is voor Windows- en Linux-omgevingen voor een educatieve omgeving als alternatief voor de huidige Vagrant provisioner.
 
 
-
-
+\subsection{Rust als programmeertaal}
+Rust werd gekozen voor de provisioner vanwege goede cross-platform compatibiliteit, waardoor de tool zowel op Linux als Windows werkt zonder veel aanpassingen te doen. De taal combineert performantie en geheugenveiligheid door het Ownership-model, dit zorgt ervoor dat veel voorkomende fouten zoals geheugenlekken voorkomen worden \autocite{Micah2023,Klabnik2018}. Dit is cruciaal voor infrastructuurtools, bij het afhandelen van foutscenario's zoals een onderbroken provisioning of een mislukte SSH-verbinding zorgt dit ervoor dat alles onder controle blijft\autocite{Micah2023}.
 
 % Voor literatuurverwijzingen zijn er twee belangrijke commando's:
 % \autocite{KEY} => (Auteur, jaartal) Gebruik dit als de naam van de auteur
@@ -65,36 +70,55 @@ Ook speelt tijd een grote rol. De \emph{provisioning time}, de tijd die tussen h
 
 
 
-\subsection{Fase 1: Vereisten verzamelen}
-In de eerste fase worden de functionele en niet-functionele requirements in kaart gebracht, dit zal gedaan worden op basis van de huidige problemen met Vagrant en de vereisten van onderwijs en testomgevingen. Hierbij zal bepaald worden welke besturingssystemen we zullen ondersteunen voor het opzetten van de virtuele omgeving, welke virtualisatie software relevant is en welke programmeertaal dat het meest optimaal zou zijn voor het schrijven van een provisioner.
-
-\subsection{Fase 2: Programmeertaal bestuderen}
-In de tweede fase wordt de focus gelegd op het aanleren van de gekozen programmeertaal. Hierbij zullen de basisconcepten van de taal geleerd worden, zoals functies,methodes,datatypes en algemene syntax. Aan de hand van verschillende kleine projecten worden deze concepten dan toegepast en aangeleerd.
-
-\subsection{Fase 3: Programmeren van de software}
-In de derde fase wordt de provisioner ontwikkeld op basis van de verzamelde vereisten. In het begin zullen de kernfunctionaliteiten worden geïmplementeerd, zoals het opstarten van de virtuele machines, het lezen van de configuratiefiles en het uitvoeren van de provisioning scripts. Daarna zullen verschillende extra functionaliteiten toegevoegd worden, ook zal er foutafhandeling en logging komen zodat de tool stabiel kan functioneren.
-
-\subsection{Fase 4: Testen}
-In de vierde fase wordt de provisioning software getest aan de hand van verschillende scenario's, hierbij zal de software getest worden op normaal- en grensgebruik. Tijdens deze testen zal op een objectieve manier zoals opstarttijd, totale provisioningtijd, aantal fouten en de noodzaak tot manuele interventie gemeten worden, zodat duidelijk wordt in welke mate de software robuust en betrouwbaar functioneert.
-
-
-\subsection{Fase 5: Rapportering}
-In de vijfde fase worden resultaten van de testen verwerkt in de bachelorproef en andere bijhorende documentatie. Ook zal er een gebruikshandleiding geschreven worden die dat gebruikers kunnen gebruiken.
+%\subsection{Fase 1: Vereisten verzamelen}
+%In de eerste fase worden de functionele en niet-functionele requirements in kaart gebracht, dit zal gedaan worden op basis van de huidige problemen met Vagrant en de vereisten van onderwijs en testomgevingen. Hierbij zal bepaald worden welke besturingssystemen we zullen ondersteunen voor het opzetten van de virtuele omgeving, welke virtualisatie software relevant is en welke programmeertaal dat het meest optimaal zou zijn voor het schrijven van een provisioner.
 
 \begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{img/Gantt Diagram.png}
     \caption{\label{fig:gantt}Gantt diagram met de verschillende fasen en milestones van het onderzoek.}
 \end{figure*}
-\newpage
+
+\subsection{Fase 1: Programmeertaal leren}
+In de eerste fase wordt de focus gelegd op het aanleren van de gekozen programmeertaal Rust. Hierbij zullen de basisconcepten van de taal geleerd worden, zoals functies,methodes,datatypes en algemene syntax. Aan de hand van verschillende kleine projecten worden deze concepten dan toegepast en aangeleerd.
+
+%\subsection{Fase 3: Programmeren van de software}
+%In de derde fase wordt de provisioner ontwikkeld op basis van de verzamelde vereisten. In het begin zullen de kernfunctionaliteiten worden geïmplementeerd, zoals het opstarten van de virtuele machines, het lezen van de configuratiefiles en het uitvoeren van de provisioning scripts. Daarna zullen verschillende extra functionaliteiten toegevoegd worden, ook zal er foutafhandeling en logging komen zodat de tool stabiel kan functioneren.
+
+%\subsection{Fase 4: Testen}
+%In de vierde fase wordt de provisioning software getest aan de hand van verschillende scenario's, hierbij zal de software getest worden op normaal- en grensgebruik. Tijdens deze testen zal op een objectieve manier zoals opstarttijd, totale provisioningtijd, aantal fouten en de noodzaak tot manuele interventie gemeten worden, zodat duidelijk wordt in welke mate de software robuust en betrouwbaar functioneert.
+
+
+%\subsection{Fase 5: Rapportering}
+%In de vijfde fase worden resultaten van de testen verwerkt in de bachelorproef en andere bijhorende documentatie. Ook zal er een gebruikshandleiding geschreven worden die dat gebruikers kunnen gebruiken.
+
+
+\subsection{Fase 2: Sprint 1 - opstarten}
+In de eerste sprint ligt de focus op het kunnen opstarten van de virtuele machine (VM) op basis van een gemaakte testbox. De provisioner zal een VM kunnen aanmaken, configureren en starten met het virtualisatieplatform VirtualBox.
+
+\subsection{Fase 3: Sprint 2 - provisionen}
+In de tweede stap zal het provisioningproces worden uitgewerkt. De tool zal het IP-adres opvragen van de VM. Daarna wordt via SSH verbinding gemaakt en vervolgens de provisioningstappen uitgevoerd op het systeem.
+
+\subsection{Fase 4: Sprint 3 - configuratie}
+In de derde sprint wordt er ondersteuning toegevoegd voor een configuratiebestand in het TOML-formaat. De provisioner zal het configuratiebestand inlezen en verwerken, de gevraagde instellingen zullen het provisioninggedrag besturen.
+
+\subsection{Fase 5: Sprint 4 - functies}
+In de vierde sprint zullen nieuwe functies worden toegevoegd, zoals in het aanmaken en terugzetten van snapshots. Dit zorgt er voor dat de gebruiker snel terug zal kunnen gaan naar een stabiele toestand, zoals na een mislukte provisioningrun. Ook zal tijdens deze sprint meerdere boxes aangemaakt worden.
+
+\subsection{Fase 6: Sprint 5 - foutafhandeling}
+In de laatste sprint ligt de focus op het bouwen van foutafhandeling en rapportering. Fouten worden gelogd met duidelijke foutboodschappen en genoteerd in een log file. Als er een fout is moet er ook op een veilige manier een fallback-actie uitgevoerd worden, dit zorgt ervoor dat de gebruiker niet met een onbruikbare omgeving blijft zitten.
+
+%\newpage
+
 \subsection{Planning}
 De totale duur van deze methodologie is gepland over een periode van 12 weken.
 \begin{itemize}
-    \item Week 1: Vereisten verzamelen
-    \item Week 2-3: Leren van programmeer taal
-    \item Week 4-9: Programmeren
-    \item Week 10: Testen
-    \item Week 11-12: opstellen rapportering
+    \item Week 1-2: Leren van programmeer taal
+    \item Week 3-4: Sprint 1
+    \item Week 5-6: Sprint 2
+    \item Week 7-8: Sprint 3
+    \item Week 9-10: Sprint 4
+    \item Week 11-12: Sprint 5
 \end{itemize}
 
 
@@ -105,5 +129,5 @@ In dit onderzoek wordt er verwacht dat de ontwikkelde provisioner virtuele omgev
 
 Voor de doelgroep, opleidingen die dat gebruik maken van provisioning, betekent dit dat lessen, oefeningen en projecten minder tijdverlies hebben door technische problemen. De bachelorproef zal niet alleen maar een proef-of-\\concept provisioner maken maar ook documentatie en een handleiding voor mogelijkheid van uitbreiding
 
-
+\newpage
 
