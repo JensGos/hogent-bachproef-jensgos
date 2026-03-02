@@ -5,33 +5,53 @@
 \chapter{\IfLanguageName{dutch}{Inleiding}{Introduction}}%
 \label{ch:inleiding}
 
-De inleiding moet de lezer net genoeg informatie verschaffen om het onderwerp te begrijpen en in te zien waarom de onderzoeksvraag de moeite waard is om te onderzoeken. In de inleiding ga je literatuurverwijzingen beperken, zodat de tekst vlot leesbaar blijft. Je kan de inleiding verder onderverdelen in secties als dit de tekst verduidelijkt. Zaken die aan bod kunnen komen in de inleiding~\autocite{Pollefliet2011}:
+%De inleiding moet de lezer net genoeg informatie verschaffen om het onderwerp te begrijpen en in te zien waarom de onderzoeksvraag de moeite waard is om te onderzoeken. In de inleiding ga je literatuurverwijzingen beperken, zodat de tekst vlot leesbaar blijft. Je kan de inleiding verder onderverdelen in secties als dit de tekst verduidelijkt. Zaken die aan bod kunnen komen in de inleiding~\autocite{Pollefliet2011}:
+%
+%\begin{itemize}
+%  \item context, achtergrond
+%  \item afbakenen van het onderwerp
+%  \item verantwoording van het onderwerp, methodologie
+%  \item probleemstelling
+%  \item onderzoeksdoelstelling
+%  \item onderzoeksvraag
+%  \item \ldots
+%\end{itemize}
 
-\begin{itemize}
-  \item context, achtergrond
-  \item afbakenen van het onderwerp
-  \item verantwoording van het onderwerp, methodologie
-  \item probleemstelling
-  \item onderzoeksdoelstelling
-  \item onderzoeksvraag
-  \item \ldots
-\end{itemize}
+Binnen de richting IT Infrastructure Engineer aan HOGENT wordt gebruikgemaakt van verschillende provisioningtools om virtuele Windows- en Linuxomgevingen op te zetten. Een veelgebruikte tool is Vagrant: studenten gebruiken deze om ontwikkel- en labo-omgevingen te automatiseren op basis van een declaratieve configuratiefile. In de praktijk treden echter verschillende problemen op tijdens dit proces: virtuele machines starten traag op, het provisioningproces loopt soms vast of wordt niet gestart door time-outs, virtuele machines kunnen onverwachte \emph{kernel panics} vertonen en bij het onderbreken van het provisioningproces blijft dit soms op de achtergrond verder draaien, waardoor de gebruiker het proces manueel moet stopzetten. Dit zorgt voor veel frustraties en tijdverlies, zowel in onderwijs- als bedrijfscontext.
+
+
 
 \section{\IfLanguageName{dutch}{Probleemstelling}{Problem Statement}}%
 \label{sec:probleemstelling}
 
-Uit je probleemstelling moet duidelijk zijn dat je onderzoek een meerwaarde heeft voor een concrete doelgroep. De doelgroep moet goed gedefinieerd en afgelijnd zijn. Doelgroepen als ``bedrijven,'' ``KMO's'', systeembeheerders, enz.~zijn nog te vaag. Als je een lijstje kan maken van de personen/organisaties die een meerwaarde zullen vinden in deze bachelorproef (dit is eigenlijk je steekproefkader), dan is dat een indicatie dat de doelgroep goed gedefinieerd is. Dit kan een enkel bedrijf zijn of zelfs één persoon (je co-promotor/opdrachtgever).
+%Uit je probleemstelling moet duidelijk zijn dat je onderzoek een meerwaarde heeft voor een concrete doelgroep. De doelgroep moet goed gedefinieerd en afgelijnd zijn. Doelgroepen als ``bedrijven,'' ``KMO's'', systeembeheerders, enz.~zijn nog te vaag. Als je een lijstje kan maken van de personen/organisaties die een meerwaarde zullen vinden in deze bachelorproef (dit is eigenlijk je steekproefkader), dan is dat een indicatie dat de doelgroep goed gedefinieerd is. Dit kan een enkel bedrijf zijn of zelfs één persoon (je co-promotor/opdrachtgever).
+
+De huidige Vagrant-gebaseerde aanpak voor provisioning in de opleiding Toegepaste Informatica aan HOGENT leidt regelmatig tot trage opstarttijden, vastlopende provisioning en instabiele virtuele machines. Dit zorgt ervoor dat studenten en lectoren tijd verliezen tijdens de lessen, labo's en evaluaties. Hierdoor wordt de focus van de lessen verlegd van het leren naar het oplossen van verschillende technische problemen. De doelgroep van dit onderzoek bestaat uit studenten en docenten binnen de richting IT Infrastructure Engineer aan HOGENT. Zij hebben nood aan een meer performante en betrouwbare provisioningsoplossing die beter is afgestemd op een onderwijs- en laboomgeving.
 
 \section{\IfLanguageName{dutch}{Onderzoeksvraag}{Research question}}%
 \label{sec:onderzoeksvraag}
 
-Wees zo concreet mogelijk bij het formuleren van je onderzoeksvraag. Een onderzoeksvraag is trouwens iets waar nog niemand op dit moment een antwoord heeft (voor zover je kan nagaan). Het opzoeken van bestaande informatie (bv. ``welke tools bestaan er voor deze toepassing?'') is dus geen onderzoeksvraag. Je kan de onderzoeksvraag verder specifiëren in deelvragen. Bv.~als je onderzoek gaat over performantiemetingen, dan 
+%Wees zo concreet mogelijk bij het formuleren van je onderzoeksvraag. Een onderzoeksvraag is trouwens iets waar nog niemand op dit moment een antwoord heeft (voor zover je kan nagaan). Het opzoeken van bestaande informatie (bv. ``welke tools bestaan er voor deze toepassing?'') is dus geen onderzoeksvraag. Je kan de onderzoeksvraag verder specifiëren in deelvragen. Bv.~als je onderzoek gaat over performantiemetingen, dan 
+
+De centrale onderzoeksvraag van deze bachelorproef luidt:
+\begin{quote}
+    Hoe ontwerp en realiseer je een performante provisioner voor virtuele Windows- en Linuxomgevingen, die beter inspeelt op de behoeften van onderwijs en bedrijven dan de huidige Vagrant-gebaseerde aanpak?
+\end{quote}
+
+Om deze hoofdonderzoeksvraag te concretiseren, worden volgende deelvragen onderzocht:
+\begin{itemize}
+    \item Welke functionaliteiten zijn essentieel voor een provisioner die in onderwijs- en labo-omgevingen wordt gebruikt?
+    \item Op welke besturingssystemen zal de provisioner zelf draaien?
+    \item Voor welke gast-besturingssystemen moet de provisioner virtuele machines kunnen opbouwen en configureren?
+\end{itemize}
+
 
 \section{\IfLanguageName{dutch}{Onderzoeksdoelstelling}{Research objective}}%
 \label{sec:onderzoeksdoelstelling}
 
-Wat is het beoogde resultaat van je bachelorproef? Wat zijn de criteria voor succes? Beschrijf die zo concreet mogelijk. Gaat het bv.\ om een proof-of-concept, een prototype, een verslag met aanbevelingen, een vergelijkende studie, enz.
+%Wat is het beoogde resultaat van je bachelorproef? Wat zijn de criteria voor succes? Beschrijf die zo concreet mogelijk. Gaat het bv.\ om een proof-of-concept, een prototype, een verslag met aanbevelingen, een vergelijkende studie, enz.
 
+Het doel van deze bachelorproef is een proof-of-concept provisioner te schrijven in Rust. Deze zal virtuele Linux- en Windows-omgevingen kunnen opzetten op een betrouwbare manier. De succescriteria omvatten een werkende command-line tool die op Windows kan worden uitgevoerd, en ondersteuning voor kernfunctionaliteiten zoals het opstarten van de VM, provisioning via SSH en configuratie via een declaratief bestand. Daarnaast wordt een aantoonbare verbetering in de provisioningtijd en stabiliteit tegenover de bestaande Vagrant-omgevingen verwacht. Tot slot zal er documentatie en een gebruikershandleiding voorzien worden, zodat de tool inzetbaar is binnen de opleiding Toegepaste Informatica aan HOGENT.
 \section{\IfLanguageName{dutch}{Opzet van deze bachelorproef}{Structure of this bachelor thesis}}%
 \label{sec:opzet-bachelorproef}
 

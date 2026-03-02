@@ -26,5 +26,68 @@
 %% Maak voor elke fase (behalve het literatuuronderzoek) een NIEUW HOOFDSTUK aan
 %% en geef het een gepaste titel.
 
+
+
+\subsection{Fase 1: Rust aanleren}
+In de eerste fase wordt de focus gelegd op het aanleren van de gekozen programmeertaal Rust. Hierbij zullen de basisconcepten van de taal geleerd worden, zoals functies,methodes,datatypes en algemene syntax. Aan de hand van verschillende kleine projecten worden deze concepten dan toegepast en aangeleerd.
+\subsubsection{Week 1-2}
+Tijdens deze week werd de Rust Quick Start Guide \autocite{Arbuckle2018} doorgenomen en werden er verschillende scripts uitgevoerd om diverse concepten uit te testen.
+
+
+
+
+
+\subsection{Fase 2: Sprint 1 - opstarten}
+In de eerste sprint ligt de focus op het kunnen opstarten van de virtuele machine (VM) op basis van een gemaakte testbox. De provisioner zal een VM kunnen aanmaken, configureren en starten met het virtualisatieplatform VirtualBox.
+
+
+\subsubsection{Week 3}
+Tijdens deze week werd het opstarten van de VM aan de hand van verschillende VBoxManage-commando's geïmplementeerd. Dit begon met het maken van een Ubuntu- en Windows 10-VM om als basisboxen te gebruiken. Via het script wordt een nieuwe VM aangemaakt met het gekozen besturingssysteem. Dit wordt gedaan door het .vdi-bestand te kopiëren van de vooraf aangemaakte VM en de Universally Unique Identifier (UUID) aan te passen, zodat er geen conflicten optreden. Vervolgens wordt deze schijf gemount en wordt de VM opgestart, nu deze klaar is voor verder gebruik.
+
+
+\subsubsection{Week 4}
+
+\subsection{Fase 3: Sprint 2 - provisionen}
+In de tweede stap zal het provisioningproces worden uitgewerkt. De tool zal het IP-adres opvragen van de VM. Daarna wordt via SSH verbinding gemaakt en vervolgens de provisioningstappen uitgevoerd op het systeem.
+
+
+\subsubsection{Week 5}
+\subsubsection{Week 6}
+
+\subsection{Fase 4: Sprint 3 - configuratie}
+In de derde sprint wordt er ondersteuning toegevoegd voor een configuratiebestand in het TOML-formaat. De provisioner zal het configuratiebestand inlezen en verwerken, de gevraagde instellingen zullen het provisioninggedrag besturen.
+
+
+\subsubsection{Week 7}
+\subsubsection{Week 8}
+
+\subsection{Fase 5: Sprint 4 - functies}
+In de vierde sprint zullen nieuwe functies worden toegevoegd, zoals in het aanmaken en terugzetten van snapshots. Dit zorgt er voor dat de gebruiker snel terug zal kunnen gaan naar een stabiele toestand, zoals na een mislukte provisioningrun. Ook zal tijdens deze sprint meerdere boxes aangemaakt worden.
+
+
+\subsubsection{Week 9}
+\subsubsection{Week 10}
+
+\subsection{Fase 6: Sprint 5 - foutafhandeling}
+In de laatste sprint ligt de focus op het bouwen van foutafhandeling en rapportering. Fouten worden gelogd met duidelijke foutboodschappen en genoteerd in een log file. Als er een fout is moet er ook op een veilige manier een fallback-actie uitgevoerd worden, dit zorgt ervoor dat de gebruiker niet met een onbruikbare omgeving blijft zitten.
+
+
+\subsubsection{Week 11}
+\subsubsection{Week 12}
+%\newpage
+
+\subsection{Planning}
+De totale duur van deze methodologie is gepland over een periode van 12 weken.
+\begin{itemize}
+    \item Week 1-2: Rust aanleren
+    \item Week 3-4: Sprint 1
+    \item Week 5-6: Sprint 2
+    \item Week 7-8: Sprint 3
+    \item Week 9-10: Sprint 4
+    \item Week 11-12: Sprint 5
+\end{itemize}
+
+
+
 \lipsum[21-25]
 
