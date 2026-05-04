@@ -47,37 +47,56 @@ Tijdens deze week werd het opstarten van de VM aan de hand van verschillende VBo
 
 \subsubsection{Week 4}
 
-\subsection{Fase 3: Sprint 2 - provisionen}
-In de tweede stap zal het provisioningproces worden uitgewerkt. De tool zal het IP-adres opvragen van de VM. Daarna wordt via SSH verbinding gemaakt en vervolgens de provisioningstappen uitgevoerd op het systeem.
+Tijdens deze week werd de code herschreven zodat die meer overeenkomt met Objectgeoriënteerd programmeren (OOP). Dit maakt de structuur duidelijker en vergemakkelijkt toekomstige uitbreidingen van de code.
 
+\subsection{Fase 3: Sprint 2 - provisionen}
+
+In de tweede stap wordt het provisioningproces verder uitgewerkt. Hierbij wordt de NAT-portforwarding aangepast zodat er via SSH verbinding kan worden gemaakt met de VM. Daarna worden de provisioningstappen uitgevoerd op het systeem.
 
 \subsubsection{Week 5}
+
+Tijdens deze week werd de virtuele machine verder aangepast zodat er aparte functies beschikbaar zijn voor Linux- en Windows-VM's. Hierdoor kan de uitvoering van scripts afhankelijk worden gemaakt van het type besturingssysteem.
+
 \subsubsection{Week 6}
+
+In deze week werd de code verder toegepast voor het verbinden met de VM via SSH en het uitvoeren van scripts op basis van het gebruikte besturingssysteem. Op die manier wordt het provisioningproces beter afgestemd op de gekozen omgeving.
 
 \subsection{Fase 4: Sprint 3 - configuratie}
 In de derde sprint wordt er ondersteuning toegevoegd voor een configuratiebestand in het TOML-formaat. De provisioner zal het configuratiebestand inlezen en verwerken, de gevraagde instellingen zullen het provisioninggedrag besturen.
 
-
 \subsubsection{Week 7}
+
+Tijdens deze week werd het lezen van het TOML-bestand opgestart. Op dat moment was de implementatie nog niet volledig uitgewerkt, maar wel al voldoende om de eerste structuur op te zetten.
+
 \subsubsection{Week 8}
+
+Tijdens deze week werd het inlezen van het TOML-bestand verder uitgewerkt en geïntegreerd in de werking van het programma. Daarnaast werd een init-functie toegevoegd die de juiste folderstructuur aanmaakt.
+
+
 
 \subsection{Fase 5: Sprint 4 - functies}
 In de vierde sprint zullen nieuwe functies worden toegevoegd, zoals in het aanmaken en terugzetten van snapshots. Dit zorgt er voor dat de gebruiker snel terug zal kunnen gaan naar een stabiele toestand, zoals na een mislukte provisioningrun. Ook zal tijdens deze sprint meerdere boxes aangemaakt worden.
 
 
 \subsubsection{Week 9}
+
+Tijdens deze week werd begonnen met het toepassen van snapshots. De code werd aangepast zodat het aanmaken van snapshots correct kon worden geïntegreerd in het provisioningproces. Daarnaast werden functies opgesplitst zodat ze afzonderlijk kunnen worden gebruikt voor één VM of voor meerdere VM’s. Tot slot werd de CLI-input verder verbeterd met behulp van \texttt{clap}\autocite{clapCrate}.
 \subsubsection{Week 10}
+
+Tijdens deze week werd een aparte functie toegevoegd om de status van de VM op te halen, zodat gecontroleerd kan worden of deze actief is. Daarnaast werd de bridge network adapter toegevoegd, zodat deze kan worden gebruikt wanneer de gebruiker dat wenst. Tot slot werden de snapshotfuncties verder uitgewerkt en toegepast.
 
 \subsection{Fase 6: Sprint 5 - foutafhandeling}
 In de laatste sprint ligt de focus op het bouwen van foutafhandeling en rapportering. Fouten worden gelogd met duidelijke foutboodschappen en genoteerd in een log file. Als er een fout is moet er ook op een veilige manier een fallback-actie uitgevoerd worden, dit zorgt ervoor dat de gebruiker niet met een onbruikbare omgeving blijft zitten.
 
 
 \subsubsection{Week 11}
+x
 \subsubsection{Week 12}
+x
 %\newpage
 
 \subsection{Planning}
-De totale duur van deze methodologie is gepland over een periode van 12 weken.
+De totale duur van deze methodologie is gepland over een periode van 12 schoolweken tijdens semester 2 van het academiejaar 2025-2026.
 \begin{itemize}
     \item Week 1-2: Rust aanleren
     \item Week 3-4: Sprint 1
@@ -89,5 +108,4 @@ De totale duur van deze methodologie is gepland over een periode van 12 weken.
 
 
 
-\lipsum[21-25]
 
