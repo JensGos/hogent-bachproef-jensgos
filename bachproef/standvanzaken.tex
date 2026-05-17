@@ -105,10 +105,6 @@ Naast de VDI-keuze speelt ook de netwerkconfiguratie een rol in de totale opstar
 
 De provisioner doorloopt een vaste reeks stappen: de VM wordt opgestart, het IP-adres wordt opgehaald, er wordt verbinding gemaakt via SSH en vervolgens worden de provisioningstaken uitgevoerd. Deze reeks gebeurt in een vaste volgorde omdat elke stap afhankelijk is van de vorige. Zonder een correct opgestarte VM kan bijvoorbeeld geen netwerkverbinding worden gemaakt, en zonder SSH kan geen verdere configuratie gebeuren.
 
-\subsection{Provisioningworkflow}
-
-De provisioner doorloopt een vaste reeks stappen: de VM wordt opgestart, het IP-adres wordt opgehaald, er wordt verbinding gemaakt via SSH en vervolgens worden de provisioningstaken uitgevoerd. Deze reeks gebeurt in een vaste volgorde omdat elke stap afhankelijk is van de vorige. Zonder een correct opgestarte VM kan bijvoorbeeld geen netwerkverbinding worden gemaakt, en zonder SSH kan geen verdere configuratie gebeuren.
-
 \begin{enumerate}
     \item \textbf{Aanmaken VM}
     
@@ -139,6 +135,32 @@ De provisioner doorloopt een vaste reeks stappen: de VM wordt opgestart, het IP-
     Zodra de VM beschikbaar is, wordt via SSH verbinding gemaakt en kunnen gedeelde mappen of andere provisioningstaken worden uitgevoerd. Via SSH kunnen configuratiescripts of installatieopdrachten op afstand worden uitgevoerd. Shared folders kunnen daarnaast gebruikt worden om bestanden tussen host en VM uit te wisselen.
 \end{enumerate}
 
+
+\subsubsection{Linux provisioning}
+
+
+\begin{listing}[H]
+    \begin{minted}{rust}
+        channel.exec(&format!("echo {} | sudo -S bash /media/sf_shared/{}", password, scriptname))
+        .expect("Command execution failed");
+    \end{minted}
+    \caption[Provisioning in Linux]{Uitvoering van het provisioningscript in Linux}
+    \label{lst:linux-prov-line}
+\end{listing}
+
+
+\subsubsection{Windows provisioning}
+
+
+\begin{listing}[H]
+    \begin{minted}{rust}
+        channel.exec(&format!(".\\psexec.exe -s -accepteula powershell.exe -ExecutionPolicy Bypass -File \"Z:\\{}\"", scriptname))
+        .expect("Command execution failed ");
+    \end{minted}
+    \caption[Provisioning in Windows]{Uitvoering van het provisioningscript in Windows via psexec}
+    \label{lst:windows-prov-line}
+\end{listing}
+
 \subsection{Functionele uitbreidingen}
 
 Naast het opstarten en provisionen voorziet de tool ook extra functies die het gebruik in labo-omgevingen verbeteren, zoals snapshots, foutafhandeling en logging. Deze functies maken het systeem robuuster en praktischer voor dagelijks gebruik. Ze zorgen er ook voor dat de gebruiker sneller kan herstellen wanneer er iets misloopt.
@@ -150,6 +172,8 @@ Voor het provisionen kan een snapshot worden gemaakt, zodat de gebruiker bij fou
 \subsubsection{Priority Queue}
 
 De VM’s kunnen in een vaste volgorde worden opgestart via een prioriteitsmechanisme. Die volgorde wordt als extra parameter in het configuratiebestand opgenomen. Dit kan handig zijn wanneer bepaalde machines afhankelijk zijn van andere machines die eerst beschikbaar moeten zijn.
+
+\subsubsection{Kill}
 
 
 
@@ -173,7 +197,17 @@ De code past zich automatisch aan op basis van het besturingssysteem waarop de p
        }
     \end{minted}
     \caption[Zoeken naar de gebruikersmap per besturingssysteem]{Voorbeeld van hoe de doelmap dynamisch wordt opgebouwd op basis van het besturingssysteem.}
-    \label{lst:rust-example}
+    \label{lst:homedir-crossplatform}
+\end{listing}
+
+\begin{listing}[H]
+    \begin{minted}{rust}
+        if cfg!(target_os = "windows") {
+            //code fragement
+        }
+    \end{minted}
+    \caption[Zoeken naar het os type]{Zoeken naar het os type}
+    \label{lst:ostype-crossplatform}
 \end{listing}
 
 \subsubsection{Ondersteunde besturingssystemen voor provisioning}
@@ -201,9 +235,19 @@ Windows Server 2025 werd gekozen als serverbesturingssysteem voor de Windowsvakk
 
 Voor de implementatie worden onder andere de volgende Rust-crates gebruikt:
 \begin{itemize}
-    \item \texttt{ssh2} voor SSH-verbindingen. Dit werd gekozen voor cross-platform compatibiliteit, omdat de ingebouwde SSH-oplossingen van Linux en Windows te verschillend zijn en niet op dezelfde manier het wachtwoord van de gebruiker kunnen verwerken. De crate is een Rust-binding voor \texttt{libssh2}, een SSH-clientbibliotheek, en is dual-licensed onder Apache 2.0 en MIT.\autocite{ssh2Crate}
-    \item \texttt{toml} voor het inlezen van configuratiebestanden. Deze crate werd gekozen omwille van de eenvoud en duidelijkheid van het importeren van data uit een TOML-bestand. TOML is een leesbaar configuratieformaat dat vlot kan worden omgezet naar Rust-structuren. De crate is een serde-compatibele TOML-decoder en encoder voor Rust en is dual-licensed onder Apache 2.0 en MIT.\autocite{tomlCrate}
-    \item \texttt{clap} voor command-line argumenten. Dit werd gekozen omdat het een eenvoudige en gebruiksvriendelijke manier biedt om CLI-argumenten te verwerken. De crate is dual-licensed onder Apache 2.0 en MIT.\autocite{clapCrate}
+    \item \texttt{serde} voor het serialiseren en deserialiseren van gegevens. Deze crate werd gebruikt in combinatie met \texttt{toml} om configuratiebestanden vlot om te zetten naar Rust-structuren en omgekeerd.
+    
+    \item \texttt{ssh2} voor SSH-verbindingen. Deze crate werd gekozen voor cross-platform compatibiliteit, omdat de ingebouwde SSH-oplossingen van Linux en Windows te verschillend zijn en niet op dezelfde manier met authenticatie omgaan. De crate is een Rust-binding voor \texttt{libssh2}, een SSH-clientbibliotheek, en is dual-licensed onder Apache 2.0 en MIT. \autocite{ssh2Crate}
+    
+    \item \texttt{toml} voor het inlezen van configuratiebestanden. Deze crate werd gekozen omwille van de eenvoud en duidelijkheid van het importeren van data uit een TOML-bestand. TOML is een leesbaar configuratieformaat dat vlot kan worden omgezet naar Rust-structuren. De crate is een serde-compatibele TOML-decoder en -encoder voor Rust en is dual-licensed onder Apache 2.0 en MIT. \autocite{tomlCrate}
+    
+    \item \texttt{clap} voor command-line argumenten. Deze crate werd gekozen omdat ze een eenvoudige en gebruiksvriendelijke manier biedt om CLI-argumenten te verwerken. De crate is dual-licensed onder Apache 2.0 en MIT. \autocite{clapCrate}
+    
+    \item \texttt{indexmap} voor het bewaren van invoervolgorde bij configuratiegegevens. Deze crate werd gebruikt omdat de volgorde van de VM's belangrijk is bij het opstarten en provisionen, iets wat met een standaard \texttt{HashMap} niet gegarandeerd wordt.
+    
+    \item \texttt{crossterm} voor terminalinteractie en console-uitvoer. Deze crate werd gebruikt om de command-line ervaring overzichtelijker en gebruiksvriendelijker te maken.
+    
+    \item \texttt{PSTools} voor Windows-specifieke uitvoering van scripts als SYSTEM-gebruiker.
 \end{itemize}
 \subsection{Snelheidsvergelijking met Vagrant}
 

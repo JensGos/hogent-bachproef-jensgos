@@ -1,0 +1,4 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{channel}\PYG{p}{.}\PYG{n}{exec}\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n+nf+fm}{format!}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}echo \PYGZob{}\PYGZcb{} | sudo \PYGZhy{}S bash /media/sf\PYGZus{}shared/\PYGZob{}\PYGZcb{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{password}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{scriptname}\PYG{p}{))}
+\PYG{p}{.}\PYG{n}{expect}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Command execution failed\PYGZdq{}}\PYG{p}{);}
+\end{MintedVerbatim}
