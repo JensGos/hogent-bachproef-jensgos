@@ -53,6 +53,10 @@
 
 RustProv is de naam van de provisioner die in deze bachelorproef wordt ontwikkeld. De naam combineert \emph{Rust}, de gekozen programmeertaal, en \emph{Prov}, een afkorting van provisioning.
 
+
+\chapter{Literatuurstudie}
+\label{ch:Literatuurstudie}
+
 \subsection{Virtualisatie en provisioning}
 
 Virtuele machines vormen de basis van de omgevingen waarvoor de provisioner wordt ontwikkeld. In deze bachelorproef ligt de focus op het automatisch aanmaken, configureren en beschikbaar maken van een VM in een onderwijscontext. Virtualisatie laat toe om meerdere geïsoleerde omgevingen op dezelfde fysieke machine te gebruiken, wat handig is voor labo’s, testen en demo-omgevingen.
@@ -80,6 +84,10 @@ Rust werd gekozen als programmeertaal voor de provisioner vanwege de goede cross
 \subsection{Afbakening van de doelomgeving}
 
 De provisioner wordt ontworpen voor de concrete SEP-opdracht en moet de stappen ondersteunen die nodig zijn om die opdracht in een vooraf opgezette virtuele omgeving uit te voeren. Dit maakt de tool doelgericht en beperkt de scope tot wat effectief nodig is voor de opleiding. Door die afbakening blijft het project haalbaar binnen de beschikbare tijd en blijft de focus liggen op een werkende proof-of-concept. Dit project gebruikt een bridge adapter voor het netwerk en drie test-VM’s die eerder voor deze opdracht werden ingezet.
+
+
+\chapter{Provisioning}
+\label{ch:Provisioning}
 
 \subsection{Tijdswinsten tijdens het provisioningsproces}
 
@@ -161,20 +169,22 @@ De provisioner doorloopt een vaste reeks stappen: de VM wordt opgestart, het IP-
     \label{lst:windows-prov-line}
 \end{listing}
 
-\subsection{Functionele uitbreidingen}
+
+\chapter{Uitbreidingen}
+\label{ch:Uitbreidingen}
 
 Naast het opstarten en provisionen voorziet de tool ook extra functies die het gebruik in labo-omgevingen verbeteren, zoals snapshots, foutafhandeling en logging. Deze functies maken het systeem robuuster en praktischer voor dagelijks gebruik. Ze zorgen er ook voor dat de gebruiker sneller kan herstellen wanneer er iets misloopt.
 
-\subsubsection{Snapshotting}
+\subsection{Snapshotting}
 
 Voor het provisionen kan een snapshot worden gemaakt, zodat de gebruiker bij fouten altijd kan terugkeren naar een stabiele toestand. Dit verhoogt de betrouwbaarheid, maar kost wel extra opslagruimte. In een onderwijscontext kan dit nuttig zijn om snel opnieuw te beginnen zonder alles opnieuw te moeten installeren.
 
-\subsubsection{Priority Queue}
+\subsection{Priority Queue}
 
 De VM’s kunnen in een vaste volgorde worden opgestart via een prioriteitsmechanisme. Die volgorde wordt als extra parameter in het configuratiebestand opgenomen. Dit kan handig zijn wanneer bepaalde machines afhankelijk zijn van andere machines die eerst beschikbaar moeten zijn.
 
-\subsubsection{Kill}
-
+\subsection{Kill}
+Deze functie zorgt ervoor dat VirtualBox geforceerd wordt afgesloten. Ze werd toegevoegd omdat VirtualBox in sommige gevallen niet correct reageert bij het beheren van virtuele machines, bijvoorbeeld wanneer het programma vastloopt of foutcodes blijft geven.
 
 
 \subsection{Ondersteuning}
@@ -249,6 +259,12 @@ Voor de implementatie worden onder andere de volgende Rust-crates gebruikt:
     
     \item \texttt{PSTools} voor Windows-specifieke uitvoering van scripts als SYSTEM-gebruiker.
 \end{itemize}
+
+
+
+\chapter{Benchmark}
+\label{ch:Benchmark}
+
 \subsection{Snelheidsvergelijking met Vagrant}
 
 De uiteindelijke implementatie wordt vergeleken met Vagrant om na te gaan of de nieuwe provisioner sneller of trager is. Hiervoor wordt de provisioningtijd gemeten onder gelijkaardige omstandigheden. De vergelijking gebeurt op basis van een beperkt aantal testgevallen, namelijk drie Linux-VM’s en twee Windows-VM’s. Op die manier kan worden nagegaan of de gekozen aanpak een echte verbetering vormt ten opzichte van de bestaande oplossing.
@@ -268,12 +284,14 @@ Voor Windows worden een Windows Server 2025-omgeving en een Windows 10-clientomg
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{lcc}
+    \begin{tabular}{lcccc}
         \toprule
-        \textbf{Test} & \textbf{Vagrant} & \textbf{RustProv} \\
+        \textbf{Test} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{Gemiddelde} \\
         \midrule
-        Eén VM: provisioningtijd & x & x \\
-        Meerdere VM's: totale uitvoeringstijd & x & x \\
+        Eén VM: Vagrant & x & x & x & x \\
+        Eén VM: RustProv & x & x & x & x \\
+        Meerdere VM's: Vagrant & x & x & x & x \\
+        Meerdere VM's: RustProv & x & x & x & x \\
         \bottomrule
     \end{tabular}
     \caption{Vergelijking van de Windows-tijden tussen Vagrant en RustProv in seconden.}
@@ -286,12 +304,14 @@ Voor Linux worden drie virtuele machines op een gelijkaardige manier geanalyseer
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{lcc}
+    \begin{tabular}{lcccc}
         \toprule
-        \textbf{Test} & \textbf{Vagrant} & \textbf{RustProv} \\
+        \textbf{Test} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{Gemiddelde} \\
         \midrule
-        Eén VM: provisioningtijd & x & x \\
-        Meerdere VM's: totale uitvoeringstijd & x & x \\
+        Eén VM: Vagrant & x & x & x & x \\
+        Eén VM: RustProv & x & x & x & x \\
+        Meerdere VM's: Vagrant & x & x & x & x \\
+        Meerdere VM's: RustProv & x & x & x & x \\
         \bottomrule
     \end{tabular}
     \caption{Vergelijking van de Linux-tijden tussen Vagrant en RustProv in seconden.}
