@@ -54,8 +54,7 @@
 RustProv is de naam van de provisioner die in deze bachelorproef wordt ontwikkeld. De naam combineert \emph{Rust}, de gekozen programmeertaal, en \emph{Prov}, een afkorting van provisioning.
 
 
-\chapter{Literatuurstudie}
-\label{ch:Literatuurstudie}
+
 
 \subsection{Virtualisatie en provisioning}
 
@@ -108,6 +107,14 @@ Bij het gebruik van meerdere virtuele machines worden eerst alle VM's opgestart 
 \subsubsection{Netwerk- en opslagopzet}
 
 Naast de VDI-keuze speelt ook de netwerkconfiguratie een rol in de totale opstarttijd. Door de VM meteen via een bridge adapter of vergelijkbare netwerkopzet te verbinden, kan het systeem sneller bereikbaar worden voor verdere provisioning. Dit vermindert de tijd tussen het opstarten van de VM en het moment waarop de provisioner effectief kan beginnen.
+
+
+
+\subsubsection{Preconfiguratie van boxes}
+Tijdens het opstarten van de virtuele machines wordt na het aanmaken en starten geen extra configuratie uitgevoerd. Bij Vagrant worden daarentegen nog verschillende eigenschappen van de nieuwe VM aangepast, zoals de hostname en de SSH-sleutel. Deze bijkomende stappen verlengen het opstartproces.
+
+
+
 
 \subsection{Provisioningworkflow}
 
