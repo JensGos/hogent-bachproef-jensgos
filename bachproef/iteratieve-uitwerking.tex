@@ -1,0 +1,117 @@
+\chapter{Iteratieve uitwerking}
+\label{ch:iteratieve-uitwerking}
+
+In dit hoofdstuk wordt de concrete evolutie van RustProv beschreven volgens de verschillende ontwikkelfasen. Elke fase bouwde voort op de vorige, waardoor de provisioner geleidelijk kon uitgroeien van een basisoplossing tot een tool met ondersteuning voor provisioning, configuratie, statusopvraging, snapshots en foutafhandeling. De nadruk lag telkens op het toevoegen van één afgebakende functionaliteit, waarna deze getest en verfijnd werd vooraleer de volgende stap werd uitgewerkt.
+
+\section{Sprint 1: Opstarten}
+
+In de eerste sprint werd de basis gelegd voor het aanmaken en opstarten van een virtuele machine. De focus lag op het correct aanroepen van VirtualBox en het opbouwen van de eerste functionele VM-structuur. Daarna werd de code herschreven naar een meer modulaire opzet, zodat latere uitbreidingen eenvoudiger konden worden toegevoegd.
+
+\subsection{Week 3}
+
+Tijdens deze week werd het aanmaken van een VM uitgewerkt op basis van een testbox. Hierbij werd het \texttt{.vdi}-bestand gekopieerd naar een doelmap, werd de UUID aangepast en werden de basisinstellingen zoals geheugen, CPU en netwerkconfiguratie ingesteld.
+
+\begin{lstlisting}[language=Rust,caption={Week 3: basisopzet voor het aanmaken van een VM.}]
+    % lege code hier
+\end{lstlisting}
+
+\subsection{Week 4}
+
+Tijdens deze week werd de eerste implementatie herwerkt naar een meer gestructureerde vorm. De algemene VM-logica werd losgekoppeld van de specifieke startlogica, zodat de code beter onderhoudbaar werd.
+
+\begin{lstlisting}[language=Rust,caption={Week 4: herwerking naar een modulaire structuur.}]
+    % lege code hier
+\end{lstlisting}
+
+\section{Sprint 2: Provisionen}
+
+In de tweede sprint werd de provisioningfunctionaliteit toegevoegd. Daarbij lag de nadruk op netwerktoegang via NAT-portforwarding en op het uitvoeren van scripts via SSH. Omdat Windows en Linux verschillend omgaan met scriptuitvoering, werd de logica opgesplitst per besturingssysteem.
+
+\subsection{Week 5}
+
+Tijdens deze week werden aparte functies voorzien voor Linux- en Windows-VM's. Zo kon het gedrag van de provisioner beter afgestemd worden op het gastbesturingssysteem.
+
+\begin{lstlisting}[language=Rust,caption={Week 5: opsplitsing van Linux- en Windows-logica.}]
+    % lege code hier
+\end{lstlisting}
+
+\subsection{Week 6}
+
+Tijdens deze week werd de SSH-verbinding verder uitgewerkt en werd de effectieve uitvoering van scripts geïntegreerd. Daarmee werd het provisioningproces functioneel gemaakt.
+
+\begin{lstlisting}[language=Rust,caption={Week 6: provisioning via SSH.}]
+    % lege code hier
+\end{lstlisting}
+
+\section{Sprint 3: Configuratie}
+
+In de derde sprint werd ondersteuning toegevoegd voor TOML-configuratie. Hierdoor kon de tool extern geconfigureerd worden in plaats van via hardgecodeerde waarden.
+
+\subsection{Week 7}
+
+Tijdens deze week werd de basisstructuur voor het inlezen van het configuratiebestand opgezet.
+
+\begin{lstlisting}[language=Rust,caption={Week 7: start van de TOML-configuratie.}]
+    % lege code hier
+\end{lstlisting}
+
+\subsection{Week 8}
+
+Tijdens deze week werd het inlezen van het configuratiebestand verder uitgewerkt en werd een init-functie toegevoegd om automatisch de vereiste folderstructuur aan te maken.
+
+\begin{lstlisting}[language=Rust,caption={Week 8: integratie van configuratie en initialisatie.}]
+    % lege code hier
+\end{lstlisting}
+
+\section{Sprint 4: Extra functies}
+
+In de vierde sprint werden extra functies toegevoegd om de tool bruikbaarder en robuuster te maken. Daarbij ging de aandacht naar snapshots, statuscontrole, bridge networking en ondersteuning voor meerdere VM's.
+
+\subsection{Week 9}
+
+Tijdens deze week werd de snapshotfunctionaliteit toegevoegd en werden de functies opgesplitst zodat ze zowel voor één VM als voor meerdere VM's gebruikt konden worden.
+
+\begin{lstlisting}[language=Rust,caption={Week 9: snapshots en ondersteuning voor meerdere VM's.}]
+    % lege code hier
+\end{lstlisting}
+
+\subsection{Week 10}
+
+Tijdens deze week werd de statusopvraging verder uitgewerkt en werd ondersteuning voor een bridge adapter toegevoegd.
+
+\begin{lstlisting}[language=Rust,caption={Week 10: statuscontrole en bridge adapter.}]
+    % lege code hier
+\end{lstlisting}
+
+\section{Sprint 5: Foutafhandeling}
+
+In de laatste sprint lag de nadruk op foutafhandeling en stabiliteit. De tool moest niet alleen correct werken in de ideale situatie, maar ook controleerbaar reageren wanneer er iets misliep.
+
+\subsection{Week 11}
+
+Tijdens deze week werd een prioriteitsmechanisme toegevoegd voor VM's, samen met een kill-functie en verdere uitwerking van de SSH-functionaliteit.
+
+\begin{lstlisting}[language=Rust,caption={Week 11: priority queue en kill-functie.}]
+    % lege code hier
+\end{lstlisting}
+
+\subsection{Week 12}
+
+Tijdens deze week werd de Windows-provisioning verder herwerkt zodat scripts als SYSTEM-gebruiker konden worden uitgevoerd. Daarnaast werd de stopfunctionaliteit verfijnd voor situaties waarin een VM niet correct reageerde.
+
+\begin{lstlisting}[language=Rust,caption={Week 12: Windows-provisioning en force-stop.}]
+    % lege code hier
+\end{lstlisting}
+
+\section{Planning}
+
+De iteratieve uitwerking werd gepland over twaalf schoolweken. De opeenvolging van sprints maakte het mogelijk om telkens een beperkte set functionaliteiten af te werken, te testen en nadien verder uit te breiden.
+
+\begin{itemize}
+    \item Week 1--2: Rust aanleren.
+    \item Week 3--4: Sprint 1.
+    \item Week 5--6: Sprint 2.
+    \item Week 7--8: Sprint 3.
+    \item Week 9--10: Sprint 4.
+    \item Week 11--12: Sprint 5.
+\end{itemize}

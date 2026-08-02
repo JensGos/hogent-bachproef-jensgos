@@ -28,69 +28,106 @@
 
 
 
-In dit hoofdstuk wordt het verloop van het onderzoek en de implementatie van RustProv in grote fasen beschreven. Eerst werd de programmeertaal Rust aangeleerd, waarna stapsgewijs een proof-of-concept provisioner werd opgebouwd. Elke volgende fase bouwde voort op de vorige, zodat de tool geleidelijk kon evolueren van een basisoplossing naar een meer volledige provisioner voor Windows- en Linuxomgevingen. Deze gefaseerde aanpak maakte het mogelijk om telkens een beperkt onderdeel te implementeren, te testen en daarna verder uit te breiden.
 
-\subsection{Fase 1: Rust aanleren}
-In de eerste fase werd de gekozen programmeertaal Rust aangeleerd. Daarbij lag de focus op basisconcepten zoals functies, datatypes, methodes en algemene syntax. Door kleine oefeningen en scripts uit te voeren werd de taal stap voor stap verkend, zodat de latere implementatie van de provisioner vlotter kon verlopen.
+In dit hoofdstuk wordt de opzet van het onderzoek en de ontwikkeling van RustProv op hoofdlijnen beschreven. Het traject werd opgevat als een iteratief proces waarin eerst de theoretische basis werd onderzocht, vervolgens de functionele vereisten werden vastgelegd en daarna stapsgewijs een proof-of-concept werd uitgewerkt, getest en verfijnd. Deze gefaseerde aanpak maakte het mogelijk om de scope beheersbaar te houden en om elke tussenstap afzonderlijk te evalueren. 
 
-\subsubsection{Week 1-2}
-Tijdens deze weken werd de Rust Quick Start Guide doorgenomen en werden verschillende scripts uitgevoerd om de belangrijkste concepten van de taal te oefenen \autocite{Arbuckle2018}. Op die manier werd een basis gelegd voor de verdere ontwikkeling van het project.
+\section{Aanpak}
 
-\subsection{Fase 2: Sprint 1 - opstarten}
-In de tweede fase werd gewerkt aan het opstarten van virtuele machines in VirtualBox. Het doel was om een VM automatisch te kunnen aanmaken, configureren en opstarten op basis van een vooraf gedefinieerde testbox. Deze fase vormde de technische basis van het volledige provisioningproces.
+De gekozen werkwijze bestond uit opeenvolgende fasen die telkens een duidelijk doel hadden. Eerst werd de relevante kennis over provisioning, virtualisatie en Rust opgebouwd via literatuurstudie. Daarna werden de functionele en niet-functionele vereisten geanalyseerd. Op basis daarvan werd een proof-of-concept gerealiseerd, waarna de implementatie in meerdere sprints werd uitgebreid en getest. Deze opbouw sloot aan bij de beperkte projectduur en liet toe om vroeg in het traject al werkende tussenresultaten te bekomen. 
 
-\subsubsection{Week 3}
-Tijdens deze week werd het opstarten van een VM geïmplementeerd met behulp van verschillende \texttt{VBoxManage}-commando's. Er werd gestart met een Ubuntu- en een Windows 10-VM als basisboxen. Vervolgens werd het \texttt{.vdi}-bestand van de gekozen box gekopieerd en werd de UUID aangepast zodat meerdere VM's zonder conflict konden worden aangemaakt. Daarna werd de virtuele schijf gemount en werd de VM opgestart.
+\section{Fase 1: Literatuurstudie}
 
-\subsubsection{Week 4}
-Tijdens deze week werd de code herschreven zodat die beter aansloot bij een meer objectgeoriënteerde structuur. Hierdoor werd de code overzichtelijker en beter uitbreidbaar voor latere functies.
+\subsection{Doelstelling}
 
-\subsection{Fase 3: Sprint 2 - provisionen}
-In de derde fase werd het provisioningproces zelf uitgewerkt. Daarbij lag de focus op netwerktoegang via NAT-portforwarding en op het uitvoeren van scripts via SSH. Omdat Windows en Linux verschillend omgaan met scriptuitvoering, werd de logica opgesplitst per besturingssysteem.
+De eerste fase had als doel een inhoudelijke en technische basis te leggen voor het project. Daarbij werd onderzocht wat provisioning precies inhoudt, welke rol virtuele machines spelen in een educatieve context en waarom Rust een geschikte programmeertaal is voor dit type tool. 
 
-\subsubsection{Week 5}
-Tijdens deze week werd de VM verder aangepast zodat aparte functies beschikbaar waren voor Linux- en Windows-VM's. Hierdoor kon het gedrag van de provisioner worden afgestemd op het type gastbesturingssysteem.
+\subsection{Deliverables}
 
-\subsubsection{Week 6}
-Tijdens deze week werd de verbinding met de VM via SSH verder uitgewerkt en werd de uitvoering van scripts per besturingssysteem toegepast. Daarmee werd het provisioningproces functioneel gemaakt voor zowel Linux- als Windowsomgevingen.
+De deliverables van deze fase waren een eerste inhoudelijk kader voor de bachelorproef en een afbakening van het onderzoeksdomein. Daarnaast werd duidelijk welke bestaande oplossingen, zoals Vagrant, relevant zijn als referentiepunt voor de verdere uitwerking van RustProv. 
 
-\subsection{Fase 4: Sprint 3 - configuratie}
-In de vierde fase werd ondersteuning toegevoegd voor configuratiebestanden in TOML-formaat. Hierdoor kon het provisioninggedrag worden gestuurd vanuit een extern bestand in plaats van via hardgecodeerde waarden. Dat verhoogde de flexibiliteit en maakte de tool eenvoudiger aanpasbaar.
+\subsection{Onderzoeksmethoden}
 
-\subsubsection{Week 7}
-Tijdens deze week werd het inlezen van het TOML-bestand opgestart. De implementatie was nog niet volledig afgerond, maar de basisstructuur werd wel al opgezet.
+Voor deze fase werd voornamelijk literatuuronderzoek toegepast. Daarbij werd gebruikgemaakt van wetenschappelijke bronnen, documentatie van gebruikte technologieën en achtergrondinformatie over Infrastructure as Code, virtualisatie en provisioning. Deze methode was geschikt omdat de vraagstukken in deze fase vooral conceptueel en vergelijkend van aard waren.
 
-\subsubsection{Week 8}
-Tijdens deze week werd het inlezen van het TOML-bestand verder uitgewerkt en geïntegreerd in het programma. Daarnaast werd een \texttt{init}-functie toegevoegd die de juiste folderstructuur aanmaakt, zodat de tool automatisch zijn noodzakelijke mappen kan voorbereiden.
+\subsection{Verantwoording}
 
-\subsection{Fase 5: Sprint 4 - functies}
-In de vijfde fase werden extra functies toegevoegd om de tool praktischer en robuuster te maken. Hierbij lag de focus op snapshots, het splitsen van functies voor één of meerdere VM's, het verbeteren van de CLI en het toevoegen van extra status- en netwerkfunctionaliteit.
+Een literatuurstudie was noodzakelijk om de probleemstelling correct te positioneren en om de latere requirements-analyse niet louter intuïtief op te bouwen. Door eerst de bestaande kennis te bestuderen, kon de implementatie beter worden afgestemd op de verwachtingen van een onderwijscontext en op de technische beperkingen van virtuele omgevingen. 
 
-\subsubsection{Week 9}
-Tijdens deze week werd begonnen met het toepassen van snapshots. De code werd aangepast zodat het aanmaken van snapshots correct kon worden geïntegreerd in het provisioningproces. Daarnaast werden functies opgesplitst zodat ze afzonderlijk kunnen worden gebruikt voor één VM of voor meerdere VM's. Tot slot werd de CLI-input verder verbeterd met behulp van \texttt{clap}.
+\section{Fase 2: Requirements-analyse}
 
-\subsubsection{Week 10}
-Tijdens deze week werd een aparte functie toegevoegd om de status van de VM op te halen, zodat gecontroleerd kan worden of deze actief is. Daarnaast werd een bridge network adapter toegevoegd wanneer de gebruiker dat wenst. Tot slot werden de snapshotfuncties verder uitgewerkt en toegepast.
+\subsection{Doelstelling}
 
-\subsection{Fase 6: Sprint 5 - foutafhandeling}
-In de laatste fase lag de nadruk op foutafhandeling en rapportering. Het doel was om fouten duidelijk te signaleren en de gebruiker in geval van problemen niet achter te laten met een onbruikbare omgeving. Daarnaast werd nagedacht over fallback-acties zodat de tool zo stabiel mogelijk bleef werken.
+In de tweede fase werd bepaald welke functies RustProv minimaal moest ondersteunen om als volwaardige provisioner te kunnen functioneren. Daarbij werd ook gekeken naar de extra vereisten die specifiek relevant zijn voor Windows- en Linuxomgevingen en voor het werken met één of meerdere VM’s. 
 
-\subsubsection{Week 11}
-Tijdens deze week werd de functionaliteit voor priority queue. toegevoegd, zodat VM's in een vooraf bepaalde volgorde kunnen worden opgestart en geprovisioned. Daarnaast werd de SSH-functionaliteit verder uitgewerkt, zodat gebruikers op een gebruiksvriendelijke manier verbinding kunnen maken met de virtuele machine zonder het IP-adres te weten van de client. Ook werd een kill-functie toegevoegd om VirtualBox geforceerd af te sluiten wanneer het programma niet meer correct reageert. Tot slot werden verschillende functies aangepast zodat het programma correct kan omgaan met VM's die al actief zijn.
+\subsection{Deliverables}
 
-\subsubsection{Week 12}
-Tijdens deze week werd het provisioningproces voor Windows verder herwerkt. In de oorspronkelijke versie werd het script uitgevoerd vanuit een normale gebruiker met administratieve rechten, maar dit werd aangepast zodat via PSTools en \texttt{psexec} scripts als SYSTEM-gebruiker kunnen worden uitgevoerd. Deze wijziging was nodig omdat bepaalde scripts via SSH niet correct uitvoerbaar bleken onder een gewone beheerder. Daarnaast werd een force-stopfunctie toegevoegd voor Windows-VM's die niet correct wilden stoppen. Tot slot werd een script opgesteld om Windows-VM's automatisch voor te bereiden en \texttt{psexec} te installeren in de home folder van de gebruiker.
+Het resultaat van deze fase was een requirements-overzicht met functionele en niet-functionele vereisten. Daarin kwamen onder meer configuratie via TOML, SSH-gebaseerde uitvoering, statusopvraging, snapshotondersteuning, gecontroleerd stoppen en foutafhandeling aan bod.
 
-\subsection{Planning}
-De totale duur van deze methodologie is gepland over een periode van 12 schoolweken tijdens semester 2 van het academiejaar 2025-2026.
-\begin{itemize}
-    \item Week 1-2: Rust aanleren.
-    \item Week 3-4: Sprint 1.
-    \item Week 5-6: Sprint 2.
-    \item Week 7-8: Sprint 3.
-    \item Week 9-10: Sprint 4.
-    \item Week 11-12: Sprint 5.
-\end{itemize}
+\subsection{Onderzoeksmethoden}
+
+Deze fase combineerde analyse van het probleem met technische afleiding uit de projectdoelstelling. De vereisten werden niet alleen uit de literatuur afgeleid, maar ook uit de praktische workflow van het provisionen zelf. Daarbij werd nagegaan welke stappen absoluut nodig zijn om een VM automatisch klaar te zetten voor gebruik. 
+
+\subsection{Verantwoording}
+
+Een duidelijke requirements-analyse was nodig om de scope van het project te bewaken. Zonder die afbakening zou de implementatie kunnen uitgroeien tot een algemeen VM-beheerhulpmiddel in plaats van een echte provisioner. De vereisten vormden daarom de basis voor alle latere sprints en voor de evaluatie van de uiteindelijke tool. 
+
+\section{Fase 3: Proof-of-concept en sprintaanpak}
+
+\subsection{Doelstelling}
+
+In deze fase werd RustProv stapsgewijs gerealiseerd via een reeks sprints. De doelstelling was om de kernfunctionaliteit eerst werkend te krijgen en daarna uit te breiden met configuratie, extra beheermogelijkheden en foutafhandeling.
+
+\subsection{Deliverables}
+
+De belangrijkste deliverables waren werkende tussenversies van de tool, telkens met een uitbreidend functiebereik. Aan het einde van deze fase beschikte RustProv onder meer over functies voor opstarten, statuscontrole, provisioning via SSH, configuratie-inlezing, snapshots, priority handling en noodprocedures zoals kill en force stop. 
+
+\subsection{Onderzoeksmethoden}
+
+Hier werd gekozen voor iteratieve ontwikkeling en experimenteel testen. Elke sprint bouwde voort op de vorige, waardoor nieuwe functionaliteiten gecontroleerd konden worden toegevoegd en gevalideerd. Deze aanpak liet toe om vroeg fouten of ontwerpkeuzes te detecteren, bijvoorbeeld rond UUID-conflicten, port forwarding en verschillen tussen Linux- en Windowsprovisioning. 
+
+\subsection{Verantwoording}
+
+Een iteratieve aanpak is passend voor een proof-of-concept omdat de functionele basis eerst betrouwbaar moet werken voordat bijkomende functies zinvol zijn. Door per sprint werkende software op te leveren, kon het project tijdig worden bijgestuurd en bleef de implementatie beheersbaar. 
+
+\section{Fase 4: Testopstelling en evaluatie}
+
+\subsection{Doelstelling}
+
+De vierde fase had als doel na te gaan of RustProv effectief bruikbaar is in de beoogde context en hoe de prestaties zich verhouden tot Vagrant. Hierbij werd gekeken naar zowel één-VM-scenario’s als opstellingen met meerdere VM’s. 
+
+\subsection{Deliverables}
+
+Deze fase leverde een testopstelling op met representatieve Linux- en Windows-VM’s, meetresultaten van provisioningtijden en een basis voor de vergelijking met de bestaande oplossing. Deze resultaten vormden de basis voor de analyse in het resultaten- en/of benchmarkhoofdstuk. 
+
+\subsection{Onderzoeksmethoden}
+
+Er werd gebruikgemaakt van experimenteel onderzoek en tijdsmeting. De tests werden uitgevoerd onder gelijkwaardige omstandigheden, zodat de resultaten tussen RustProv en Vagrant zo goed mogelijk vergelijkbaar bleven. Daarnaast werd geobserveerd hoe de tool zich gedroeg in foutscenario’s en bij verschillende configuraties. 
+
+\subsection{Verantwoording}
+
+Testen zijn onmisbaar omdat de meerwaarde van een provisioner niet alleen afhangt van functionaliteit, maar ook van snelheid, stabiliteit en reproduceerbaarheid. Een proof-of-concept moet daarom niet alleen werken in theorie, maar ook aantoonbaar functioneel zijn in realistische scenario’s. 
+
+\section{Fase 5: Analyse van de resultaten}
+
+\subsection{Doelstelling}
+
+In de laatste fase werden de testresultaten geïnterpreteerd en vertaald naar conclusies over de haalbaarheid van RustProv als alternatief voor de bestaande aanpak. Daarbij werd gekeken naar prestatieverschillen, praktische bruikbaarheid en beperkingen van de implementatie. 
+
+\subsection{Deliverables}
+
+De deliverables van deze fase waren een geanalyseerde benchmarkvergelijking, een inhoudelijke bespreking van de sterktes en zwaktes van RustProv, en een onderbouwde conclusie over de mate waarin de tool de vooropgestelde doelstellingen haalt. 
+
+\subsection{Onderzoeksmethoden}
+
+Voor deze fase werd vergelijkende analyse toegepast. De gemeten resultaten van RustProv werden naast die van Vagrant geplaatst en geïnterpreteerd in functie van de onderzoeksvraag. Daarnaast werd kwalitatief geëvalueerd welke keuzes in de implementatie geholpen hebben om de provisioningstijd en robuustheid te verbeteren.
+
+\subsection{Verantwoording}
+
+Een analysefase is nodig om de ruwe metingen betekenis te geven. Zonder interpretatie blijven meetresultaten louter cijfers; met analyse wordt duidelijk welke ontwerpkeuzes effectief impact hadden en waar de tool nog beperkingen vertoont. 
+
+\section{Samenvatting}
+
+De gekozen methodologie combineerde literatuurstudie, requirements-analyse, iteratieve implementatie, experimenten en resultaatanalyse. Deze aanpak was geschikt omdat RustProv niet als afgebakend standaardproduct werd ontwikkeld, maar als een proof-of-concept dat in een beperkte tijdsspanne stapsgewijs moest worden opgebouwd en geëvalueerd. Door eerst de theoretische basis te leggen en daarna per sprint te werken, kon de ontwikkeling gericht en controleerbaar verlopen. 
 
 
 

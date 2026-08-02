@@ -1,0 +1,252 @@
+\section{Experimentopzet}
+\label{sec:experimentopzet}
+
+Om de werking van RustProv te evalueren, werd een testomgeving opgezet die aansluit bij een realistische onderwijscontext. Daarbij werd gekozen voor twee afzonderlijke scenario's: een Windows-omgeving en een Linux-omgeving. Beide omgevingen zijn gebaseerd op opstellingen uit het vak SDP, zodat de experimenten zoveel mogelijk aansluiten bij een bestaande en relevante praktijksituatie binnen de opleiding.
+
+De keuze voor deze opzet maakt het mogelijk om RustProv te testen in scenario's met meerdere virtuele machines, onderlinge afhankelijkheden en afzonderlijke provisioningscripts per machine. Op die manier kan niet alleen worden nagegaan of de tool technisch correct werkt, maar ook of de gekozen aanpak bruikbaar is in een onderwijs- en labo-omgeving.
+
+\subsection{Windows-omgeving}
+
+Voor het Windows-scenario werd een omgeving uitgewerkt die gebaseerd is op een SDP-opstelling met meerdere samenwerkende systemen binnen één netwerkstructuur. Deze omgeving werd gebruikt om na te gaan of RustProv ook in een meer complexe Windows-context correct kan functioneren.
+
+\subsubsection{Enkele virtuele machine}
+
+Als eerste testgeval werd één afzonderlijke Windows-VM gebruikt. Deze test had als doel na te gaan of RustProv in staat is een enkele Windows-machine correct aan te maken, op te starten en te provisionen. In deze opstelling werd een Windows-client gebruikt waarop de nodige beheertools, waaronder RSAT, via een provisioningscript werden voorbereid. Deze configuratie vormt een beperkt maar representatief scenario voor het evalueren van de basisfunctionaliteit van de provisioner binnen een Windows-omgeving.
+
+\paragraph{Script 1}
+Het derde 
+\begin{lstlisting}[language=PowerShell,caption={Provisioningscript voor de Windows-client.}]
+    % script 3 hier invoegen
+\end{lstlisting}
+
+\subsubsection{Meerdere virtuele machines}
+
+Naast het enkelvoudige testgeval werd ook een uitgebreidere Windows-opstelling gebruikt met drie virtuele machines: twee servers en één client. Deze configuratie is gebaseerd op een SDP-scenario waarin meerdere Windows-systemen onderling samenwerken. Daardoor kan niet alleen de provisioning van afzonderlijke machines worden getest, maar ook de opstartvolgorde en de samenhang tussen verschillende systemen binnen één omgeving.
+
+Voor elke virtuele machine werd een afzonderlijk provisioningscript voorzien. Op die manier kon elke machine een eigen rol en configuratie krijgen, terwijl de provisioner toch één samenhangend scenario moest uitvoeren. Deze opdeling maakt het mogelijk om per systeem te controleren of de toegewezen configuratie correct werd toegepast.
+
+\paragraph{Script 1}
+Het eerste 
+
+\begin{lstlisting}[language=PowerShell,caption={Provisioningscript voor Windows Server 1.}]
+    % script 1 hier invoegen
+\end{lstlisting}
+
+\paragraph{Script 2}
+Het tweede script 
+
+\begin{lstlisting}[language=PowerShell,caption={Provisioningscript voor Windows Server 2.}]
+    % script 2 hier invoegen
+\end{lstlisting}
+
+\paragraph{Script 3}
+Het derde 
+\begin{lstlisting}[language=PowerShell,caption={Provisioningscript voor de Windows-client.}]
+    % script 3 hier invoegen
+\end{lstlisting}
+
+\subsection{Linux-omgeving}
+
+Voor het Linux-scenario werd een opstelling voorzien met drie virtuele machines op basis van AlmaLinux. Deze omgeving is gebaseerd op een configuratie uit het vak SDP en werd gekozen omdat ze representatief is voor een typische Linux-opstelling binnen de opleiding. Daardoor sluit dit experiment aan bij de concrete onderwijscontext waarvoor RustProv bedoeld is.
+
+\subsubsection{Enkele virtuele machine}
+
+Als eerste Linux-testgeval werd één afzonderlijke AlmaLinux-VM gebruikt. Deze test had als doel te verifiëren of RustProv een enkele Linux-machine correct kan opstarten en provisionen. In deze configuratie werd een eenvoudige serveropstelling gebruikt waarbij onder andere Apache werd voorbereid via een provisioningscript. Dit beperkte scenario laat toe de basiswerking van de Linux-provisioning afzonderlijk te evalueren. 
+
+
+\paragraph{Script 1}
+Het eerste script 
+\begin{lstlisting}[language=bash,caption={Provisioningscript voor Linux VM 1.}]
+    # script 1 hier invoegen
+\end{lstlisting}
+
+\paragraph{Script 2}
+Het tweede script 
+
+\subsubsection{Meerdere virtuele machines}
+
+Daarnaast werd ook een Linux-opstelling met drie virtuele machines getest. Deze configuratie sluit aan bij een SDP-omgeving waarin meerdere AlmaLinux-systemen gelijktijdig worden ingezet. Het gebruik van meerdere Linux-VM's maakt het mogelijk om RustProv te evalueren in een scenario met meerdere nodes, afzonderlijke scripts en een gezamenlijke uitvoeringscontext.
+
+Voor elke Linux-VM werd een apart provisioningscript voorzien. Daardoor kon elke machine een eigen configuratie en rol krijgen binnen de bredere testomgeving. Deze aanpak maakt het mogelijk om te beoordelen of RustProv de juiste scriptstappen op de juiste machine uitvoert en of meerdere Linux-systemen correct na elkaar of gezamenlijk verwerkt kunnen worden. 
+
+\subsubsection{Linux-script 1: database en Loki}
+
+Dit script installeert de databaseomgeving en Loki, zodat loggegevens centraal kunnen worden opgeslagen en later geanalyseerd. Het vormt de basislaag van de monitoringopstelling.
+
+\begin{lstlisting}[language=bash,caption={Linux-script 1: installatie van database en Loki.}]
+    #!/bin/bash
+    
+    # Install dependencies
+    sudo yum update -y
+    sudo yum install -y wget curl unzip tar
+    
+    # Download and install Loki
+    cd /opt
+    sudo mkdir -p /opt/loki
+    cd /opt/loki
+    sudo wget https://github.com/grafana/loki/releases/download/v2.9.2/loki-linux-amd64.zip
+    sudo unzip loki-linux-amd64.zip
+    sudo chmod +x loki-linux-amd64
+    sudo mv loki-linux-amd64 /usr/local/bin/loki
+    
+    # Create Loki config
+    sudo mkdir -p /etc/loki
+    cat <<EOF | sudo tee /etc/loki/loki-config.yaml > /dev/null
+    auth_enabled: false
+    
+    server:
+    http_listen_port: 3100
+    
+    common:
+    path_prefix: /loki
+    storage:
+    filesystem:
+    chunks_directory: /loki/chunks
+    rules_directory: /loki/rules
+    replication_factor: 1
+    ring:
+    kvstore:
+    store: inmemory
+    
+    schema_config:
+    configs:
+    - from: 2024-01-01
+    store: tsdb
+    object_store: filesystem
+    schema: v13
+    index:
+    prefix: loki_index_
+    period: 24h
+    
+    storage_config:
+    tsdb_shipper:
+    active_index_directory: /loki/index
+    cache_location: /loki/index_cache
+    EOF
+    
+    # Create directories
+    sudo mkdir -p /loki/chunks /loki/rules /loki/index /loki/index_cache
+    
+    # Create systemd service
+    cat <<EOF | sudo tee /etc/systemd/system/loki.service > /dev/null
+    [Unit]
+    Description=Loki
+    After=network.target
+    
+    [Service]
+    ExecStart=/usr/local/bin/loki -config.file=/etc/loki/loki-config.yaml
+    Restart=always
+    User=root
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+    
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now loki
+\end{lstlisting}
+
+\subsubsection{Linux-script 2: WordPress en Promtail}
+
+Dit script installeert WordPress en Promtail. WordPress levert de webtoepassing, terwijl Promtail de logs van het systeem doorstuurt naar Loki voor centrale logverzameling.
+
+\begin{lstlisting}[language=bash,caption={Linux-script 2: installatie van WordPress en Promtail.}]
+    #!/bin/bash
+    
+    # Update system
+    sudo yum update -y
+    sudo yum install -y httpd wget php php-mysqlnd php-fpm unzip curl
+    
+    # Install WordPress
+    cd /tmp
+    wget https://wordpress.org/latest.tar.gz
+    tar -xzf latest.tar.gz
+    sudo cp -r wordpress/* /var/www/html/
+    
+    # Set permissions
+    sudo chown -R apache:apache /var/www/html
+    sudo chmod -R 755 /var/www/html
+    
+    # Configure Apache
+    sudo systemctl enable httpd
+    sudo systemctl start httpd
+    
+    # Install Promtail
+    cd /opt
+    sudo mkdir -p /opt/promtail
+    cd /opt/promtail
+    sudo wget https://github.com/grafana/loki/releases/download/v2.9.2/promtail-linux-amd64.zip
+    sudo unzip promtail-linux-amd64.zip
+    sudo chmod +x promtail-linux-amd64
+    sudo mv promtail-linux-amd64 /usr/local/bin/promtail
+    
+    # Create Promtail config
+    sudo mkdir -p /etc/promtail
+    cat <<EOF | sudo tee /etc/promtail/promtail-config.yaml > /dev/null
+    server:
+    http_listen_port: 9080
+    
+    positions:
+    filename: /tmp/positions.yaml
+    
+    clients:
+    - url: http://127.0.0.1:3100/loki/api/v1/push
+    
+    scrape_configs:
+    - job_name: system
+    static_configs:
+    - targets:
+    - localhost
+    labels:
+    job: varlogs
+    __path__: /var/log/*log
+    EOF
+    
+    # Create systemd service
+    cat <<EOF | sudo tee /etc/systemd/system/promtail.service > /dev/null
+    [Unit]
+    Description=Promtail
+    After=network.target
+    
+    [Service]
+    ExecStart=/usr/local/bin/promtail -config.file=/etc/promtail/promtail-config.yaml
+    Restart=always
+    User=root
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+    
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now promtail
+\end{lstlisting}
+
+\subsubsection{Linux-script 3: monitoring met Grafana}
+
+Dit script installeert Grafana en maakt de monitoringomgeving volledig. Grafana gebruikt de data uit Loki om dashboards en logoverzichten weer te geven.
+
+\begin{lstlisting}[language=bash,caption={Linux-script 3: installatie van Grafana en monitoring.}]
+    #!/bin/bash
+    
+    # Install Grafana repository
+    sudo yum install -y https://dl.grafana.com/enterprise/release/grafana-enterprise-11.1.0-1.x86_64.rpm
+    
+    # Enable and start Grafana
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now grafana-server
+    
+    # Add Loki datasource via provisioning
+    sudo mkdir -p /etc/grafana/provisioning/datasources
+    cat <<EOF | sudo tee /etc/grafana/provisioning/datasources/loki.yaml > /dev/null
+    apiVersion: 1
+    
+    datasources:
+    - name: Loki
+    type: loki
+    access: proxy
+    url: http://127.0.0.1:3100
+    isDefault: true
+    EOF
+    
+    sudo systemctl restart grafana-server
+\end{lstlisting}

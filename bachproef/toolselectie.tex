@@ -1,0 +1,51 @@
+\section{\IfLanguageName{dutch}{Toolselectie}{Tool Selection}}
+\label{sec:toolselectie}
+
+Voor de realisatie van RustProv werd een aantal tools en bibliotheken geselecteerd op basis van drie centrale criteria: compatibiliteit met Windows en Linux, ondersteuning voor geautomatiseerde provisioning en voldoende flexibiliteit om zowel één VM als meerdere VM's te beheren. Daarnaast moest de gekozen stack aansluiten bij een onderwijscontext waarin herhaalbaarheid, stabiliteit en beheerbaarheid belangrijk zijn.
+
+\subsection{VirtualBox}
+
+Als virtualisatieplatform werd gekozen voor VirtualBox. Deze keuze sluit aan bij de doelomgeving van het project en maakt het mogelijk om virtuele machines programmatisch aan te maken, te configureren, te starten en te beheren. Bovendien ondersteunt VirtualBox de workflows die nodig zijn voor import, export en het gebruik van virtuele schijven, wat goed past bij de gekozen VDI-gebaseerde aanpak van RustProv.
+
+Een bijkomend voordeel is dat VirtualBox reeds gebruikt wordt in de context waarop deze bachelorproef zich richt. Daardoor kon de provisioner ontwikkeld en getest worden in een omgeving die voldoende herkenbaar en relevant is voor de beoogde onderwijs- en labo-opstellingen.
+
+\subsection{Rust}
+
+Rust werd gekozen als programmeertaal omdat de provisioner op zowel Windows als Linux moet kunnen draaien zonder grote platformafhankelijke aanpassingen. Rust werd ontwikkeld voor efficiënte systeemsoftware en combineert performantie met compile-time veiligheidsmechanismen, zoals ownership en borrowing, die bedoeld zijn om geheugen- en threadveiligheid te verbeteren. Dat maakt de taal geschikt voor een infrastructuurtool die processen, configuraties en netwerkinteracties gecontroleerd moet beheren.
+
+Voor RustProv is deze keuze relevant omdat betrouwbaarheid en voorspelbaar gedrag belangrijker zijn dan snelle prototyping alleen. Een provisioner moet immers niet alleen correct werken in het ideale scenario, maar ook robuust blijven bij fouttoestanden en verschillen tussen platformen.
+
+\subsection{ssh2}
+
+Voor de communicatie met de virtuele machines werd gekozen voor de \texttt{ssh2}-crate. Deze bibliotheek maakt het mogelijk om SSH-verbindingen op een uniforme manier te beheren vanuit Rust, wat belangrijk is in een tool die zowel Linux- als Windows-VM's moet kunnen provisionen. 
+
+De keuze voor een aparte SSH-bibliotheek was nodig omdat de ingebouwde SSH-oplossingen van Windows en Linux te veel van elkaar verschillen om op een consistente manier in één cross-platform tool te gebruiken. Door de SSH-logica centraal in Rust te beheren, werd de provisioningsstroom eenvoudiger en beter controleerbaar.
+
+\subsection{TOML en Serde}
+
+Voor de configuratie van VM's en provisioninginstellingen werd gekozen voor TOML, in combinatie met de crates \texttt{toml} en \texttt{serde}. Deze combinatie maakt het mogelijk om configuratiegegevens op een leesbare en gestructureerde manier extern te bewaren en vervolgens automatisch om te zetten naar Rust-structuren.
+
+Deze keuze is belangrijk omdat de configuratie van RustProv niet hardgecodeerd mocht blijven. Door een extern configuratiebestand te gebruiken, wordt de tool flexibeler, beter onderhoudbaar en geschikter voor herhaalbare experimenten.
+
+\subsection{Clap}
+
+Voor de command-line interface werd gekozen voor \texttt{clap}. Deze bibliotheek ondersteunt het gestructureerd verwerken van commando's, opties en argumenten, wat nuttig is voor een tool die meerdere acties moet aanbieden, zoals starten, provisionen, stoppen, verwijderen en het activeren van extra opties zoals snapshots of prioriteiten.
+
+Dankzij deze keuze blijft de gebruikersinteractie overzichtelijk en uitbreidbaar. Dat is belangrijk voor RustProv, omdat de tool niet beperkt is tot één enkele actie, maar een volledige reeks beheerstappen binnen één command-line omgeving ondersteunt.
+
+\subsection{IndexMap}
+
+Voor het bewaren van de volgorde van VM-configuraties werd gekozen voor \texttt{IndexMap}. Deze datastructuur behoudt de invoervolgorde, wat relevant is in scenario's waarin de opstart- of provisioningsvolgorde van virtuele machines betekenis heeft
+
+Die keuze is belangrijker dan bij een gewone \texttt{HashMap}, omdat een provisioner in meerlagige scenario's rekening moet kunnen houden met afhankelijkheden tussen VM's. Wanneer een bepaalde machine pas correct geconfigureerd kan worden nadat een andere reeds actief is, moet de verwerking in een voorspelbare volgorde kunnen verlopen.
+\subsection{Crossterm}
+
+Voor terminalinteractie en console-uitvoer werd \texttt{crossterm} gebruikt. Deze bibliotheek ondersteunt een duidelijkere en gebruiksvriendelijkere command-line ervaring, bijvoorbeeld voor statusmeldingen, foutmeldingen en voortgangsinformatie tijdens het uitvoeren van provisioningtaken.
+
+Hoewel \texttt{crossterm} niet tot de kern van het provisioningsproces behoort, draagt deze keuze wel bij aan de bruikbaarheid van de tool. In een toepassing waarin veel stappen automatisch na elkaar verlopen, is heldere feedback naar de gebruiker een belangrijke meerwaarde. [file:408]
+
+\subsection{PSTools}
+
+Voor Windows-specifieke provisioning werd gebruikgemaakt van PSTools, en meer bepaald van \texttt{PsExec}. Deze tool werd ingezet om scripts uit te voeren met verhoogde rechten wanneer dat via een gewone SSH-sessie niet volstond. Daardoor konden bepaalde administratieve configuratiestappen binnen Windows betrouwbaarder worden uitgevoerd.
+
+Deze keuze was nodig omdat Windows-provisioning andere eisen stelt dan Linux-provisioning. Waar Linux-scripts doorgaans rechtstreeks via SSH en \texttt{sudo} kunnen worden uitgevoerd, vereiste de Windows-opstelling bijkomende ondersteuning om systeemniveau-acties op een consistente manier toe te passen.

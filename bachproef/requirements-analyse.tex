@@ -1,0 +1,74 @@
+\section{\IfLanguageName{dutch}{Requirements-analyse}{Requirements Analysis}}
+\label{sec:requirements-analyse}
+
+Dit hoofdstuk beschrijft de minimale vereisten waaraan RustProv moet voldoen om als volwaardige provisioner te kunnen functioneren binnen de context van deze bachelorproef. De requirements-analyse vertrekt vanuit de algemene betekenis van provisioning, maar wordt vervolgens toegespitst op de concrete noden van de opleiding en de beoogde testomgevingen. Het doel van deze analyse is om vast te leggen welke functionaliteiten absoluut noodzakelijk zijn en welke uitbreidingen de tool praktischer en robuuster maken.
+
+\section{Minimale vereisten}
+Om als volwaardige provisioner te kunnen functioneren, moet \textbf{RustProv} minstens een aantal basisfuncties ondersteunen. Deze functies vormen samen de minimale keten die nodig is om een bruikbare virtuele omgeving automatisch op te zetten.
+
+\begin{enumerate}
+    \item \textbf{Configuratie kunnen inlezen}\\
+    Een eerste vereiste is dat de tool configuratiegegevens kan inlezen uit een extern bestand. Hierdoor worden instellingen niet hardgecodeerd in de broncode en kan het gedrag van de tool aangepast worden zonder de implementatie te wijzigen. In RustProv gebeurt dit via TOML-configuratiebestanden, wat de leesbaarheid en uitbreidbaarheid van de configuratie verhoogt.
+    
+    \item \textbf{Een virtuele machine kunnen aanmaken of herkennen}\\
+    Een provisioner moet in staat zijn om een virtuele machine aan te maken wanneer die nog niet bestaat, of een bestaande machine te herkennen wanneer die reeds aanwezig is. Deze vereiste is noodzakelijk om herbruikbare workflows te ondersteunen en om te vermijden dat telkens een volledig nieuwe omgeving moet worden opgebouwd.
+    
+    \item \textbf{Een VM kunnen starten en stoppen}\\
+    Naast het aanmaken van een VM moet de tool deze ook gecontroleerd kunnen starten en stoppen. Zonder deze mogelijkheid kan het provisioningproces niet op een betrouwbare manier worden uitgevoerd. Voor RustProv is dit extra belangrijk omdat meerdere scenario’s gebruikmaken van zowel één enkele VM als van een opstelling met meerdere onderling afhankelijke VM’s.
+    
+    \item \textbf{Netwerktoegang kunnen voorzien}\\
+    Een provisioner moet de gastmachine kunnen bereiken via een netwerkverbinding, typisch via SSH of een gelijkaardig communicatiekanaal. Zonder deze stap is het niet mogelijk om automatisch configuratieopdrachten uit te voeren op de VM. In RustProv wordt hiervoor gewerkt met SSH-gebaseerde toegang, waarbij netwerkregels tijdelijk worden ingesteld zodat de machine bereikbaar wordt tijdens de provisioningfase.
+    
+    \item \textbf{Scripts of configuratiestappen kunnen uitvoeren}\\
+    Het eigenlijke provisionen bestaat uit het uitvoeren van scripts of andere configuratiestappen op de gastmachine. Dit is de kernfunctie van de tool: zonder deze mogelijkheid blijft enkel VM-beheer over. De provisioner moet dus niet alleen toegang krijgen tot de machine, maar ook effectief een script kunnen starten en opvolgen tot de configuratie voltooid is.
+    
+    \item \textbf{Fouten kunnen signaleren en herstellen}\\
+    Een laatste minimale vereiste is foutafhandeling. Wanneer een stap in het proces mislukt, moet de gebruiker geïnformeerd worden en moet de tool het proces gecontroleerd kunnen afbreken of herstellen. Dit is noodzakelijk om te vermijden dat een onbruikbare of half geconfigureerde omgeving achterblijft. In een onderwijscontext is dit extra belangrijk, omdat instabiele omgevingen leiden tot tijdverlies en verwarring.
+\end{enumerate}
+
+\section{Vereisten voor RustProv}
+Op basis van deze algemene minimale vereisten worden voor RustProv meer concrete functionele eisen geformuleerd. Deze vereisten zijn afgeleid uit de doelstelling van de bachelorproef en uit de nood aan ondersteuning voor zowel eenvoudige als meer complexe VM-scenario’s binnen de opleiding.
+
+\begin{description}
+    \item[Ondersteuning voor Windows en Linux] RustProv moet zowel Windows- als Linux-VM’s kunnen ondersteunen. Die keuze is logisch, omdat beide platformen binnen de opleiding gebruikt worden en omdat de bachelorproef expliciet gericht is op provisioning voor beide types gastbesturingssystemen.
+    
+    \item[Ondersteuning voor één of meerdere VM’s] De tool moet inzetbaar zijn voor zowel een eenvoudige opstelling met één VM als voor uitgebreidere scenario’s met meerdere VM’s. Dat is nodig omdat de experimenten en benchmarks niet beperkt blijven tot één enkele machine, maar ook meerlagige opstellingen omvatten.
+    
+    \item[Externe configuratie via TOML] Alle belangrijke instellingen moeten via een extern TOML-bestand kunnen worden beschreven. Op die manier wordt de opstelling declaratiever en eenvoudiger aanpasbaar. Deze vereiste ondersteunt ook de reproduceerbaarheid van experimenten, omdat dezelfde configuratie opnieuw gebruikt kan worden voor meerdere testruns.
+    
+    \item[SSH-gebaseerde uitvoering van scripts] De uitvoering van provisioningsscripts moet via SSH of een vergelijkbare benadering gebeuren. RustProv gebruikt hiervoor een aparte SSH-library, omdat de ingebouwde oplossingen van Windows en Linux te veel van elkaar verschillen om op een uniforme manier te gebruiken. Deze keuze ondersteunt de cross-platform doelstelling van de tool.
+    
+    \item[VM-status kunnen opvragen] De gebruiker moet de status van een VM kunnen opvragen. Deze functionaliteit is nodig om te bepalen of een machine reeds actief is, nog moet worden opgestart of correct werd afgesloten. Dit draagt bij tot een betrouwbaarder provisioningproces en voorkomt onnodige dubbele acties.
+    
+    \item[Snapshots kunnen maken en herstellen] RustProv moet snapshots kunnen aanmaken en, waar nodig, gebruiken om sneller terug te keren naar een eerdere toestand. Deze vereiste is vooral relevant tijdens testen en herhaalde provisioningruns, omdat ze het mogelijk maakt om niet telkens een volledige VM opnieuw te moeten opbouwen.
+    
+    \item[VM’s stoppen, geforceerd stoppen en verwijderen] Naast gewone stopfunctionaliteit moet de tool ook ondersteuning bieden voor geforceerd stoppen en verwijderen van VM’s. Dit is relevant omdat virtuele machines in de praktijk niet altijd correct reageren op standaardcommando’s. Door deze mogelijkheden te voorzien, blijft de tool ook bruikbaar in foutscenario’s.
+    
+    \item[Tijdelijke netwerkregels kunnen opschonen] Omdat tijdens de provisioning tijdelijk netwerkregels kunnen worden toegevoegd, moet RustProv deze regels ook opnieuw kunnen verwijderen wanneer ze niet langer nodig zijn. Dit voorkomt conflicten met andere toepassingen en helpt om de hostomgeving netjes achter te laten na afloop van het proces.
+\end{description}
+
+\section{Functionele en niet-functionele vereisten}
+De requirements van RustProv kunnen samengevat worden als een combinatie van functionele en niet-functionele vereisten.
+
+\subsection*{Functionele vereisten}
+\begin{itemize}
+    \item Inlezen van configuratie uit een extern bestand.
+    \item Aanmaken, herkennen, starten en stoppen van VM’s.
+    \item Uitvoeren van provisioningscripts op Windows- en Linux-VM’s.
+    \item Ondersteuning voor één of meerdere VM’s binnen één scenario.
+    \item Opvragen van VM-status, maken van snapshots en verwijderen van VM’s.
+\end{itemize}
+
+\subsection*{Niet-functionele vereisten}
+\begin{itemize}
+    \item Herhaalbaarheid van experimenten en configuraties.
+    \item Bruikbaarheid binnen een onderwijs- en labo-omgeving.
+    \item Ondersteuning voor verschillende besturingssystemen.
+    \item Betrouwbare foutafhandeling en gecontroleerd opschonen van tijdelijke configuraties.
+    \item Voldoende flexibiliteit om nieuwe scenario’s later toe te voegen.
+\end{itemize}
+
+\section{Afbakening}
+Deze bachelorproef richt zich op een proof-of-concept en niet op een volledig productierijp provisioningplatform. Dat betekent dat de focus ligt op de kernfunctionaliteit die nodig is om geautomatiseerde Windows- en Linuxomgevingen te kunnen opzetten en vergelijken met een bestaande aanpak zoals Vagrant. Vereisten zoals uitgebreide logging, een grafische gebruikersinterface of brede ondersteuning voor andere hypervisors vallen buiten de primaire scope van dit onderzoek, tenzij ze rechtstreeks bijdragen aan de evaluatie van RustProv binnen de gekozen experimenten.
+
+\end{document}

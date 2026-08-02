@@ -1,0 +1,75 @@
+\chapter{\IfLanguageName{dutch}{Implementatie}{Implementation}}%
+\label{ch:implementatie}
+
+Dit hoofdstuk beschrijft hoe RustProv stapsgewijs werd opgebouwd tijdens de verschillende sprints van het project. Waar het hoofdstuk Methodologie vooral het plan van aanpak op hoofdlijnen toelicht, ligt de focus hier op de concrete technische uitwerking. Per sprint wordt aangegeven welke functionaliteiten werden gerealiseerd, welke ontwerpkeuzes daarbij belangrijk waren en wat de tool op dat moment reeds kon uitvoeren.
+
+\section{Sprint 1: opstarten van virtuele machines}
+
+De eerste implementatiesprint richtte zich op het automatisch kunnen aanmaken en opstarten van een virtuele machine in VirtualBox. Deze fase vormde de technische basis voor de rest van het project, omdat provisioning pas mogelijk wordt zodra een VM correct geregistreerd, geconfigureerd en gestart kan worden. In deze sprint werden de eerste functies \texttt{start} en \texttt{state} voorzien, al waren deze in het begin nog beperkt uitgewerkt.
+
+Tijdens deze sprint werd gebruikgemaakt van \texttt{VBoxManage}-commando's om nieuwe VM's te registreren, de hardware-instellingen te configureren en een bestaand \texttt{.vdi}-bestand als virtuele schijf te koppelen. Daarbij werd een bestaande box gekopieerd naar een tijdelijke doelmap, waarna de UUID van de schijf aangepast werd. Deze stap was nodig om conflicten te vermijden wanneer meerdere VM's op basis van dezelfde box moesten worden aangemaakt. Daarnaast werd ook een shared folder gekoppeld, zodat latere provisioningscripts vanuit de hostomgeving beschikbaar konden worden gemaakt in de gastmachine.
+
+Aan het einde van deze sprint kon RustProv reeds een VM opstarten op basis van een voorbereide box en de toestand van die VM opvragen. De codebasis bestond aanvankelijk uit één groter bestand, maar werd tijdens deze fase al gedeeltelijk herschikt naar een meer modulaire structuur om latere uitbreidingen mogelijk te maken.
+
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na sprint 1.}]
+
+\end{lstlisting}
+
+\section{Sprint 2: provisioning via SSH}
+
+De tweede sprint richtte zich op het effectieve provisioningproces. Nadat het opstarten van een VM functioneerde, werd de volgende stap het automatisch verbinden met de machine en het uitvoeren van scripts. Hierbij lag de nadruk op netwerktoegang via NAT-portforwarding en op de uitvoering van provisioningsscripts via SSH.
+
+Omdat Linux- en Windowsomgevingen op een andere manier omgaan met scriptuitvoering, werd de provisioningslogica opgesplitst per type gastbesturingssysteem. Voor Linux werd een script uitgevoerd via \texttt{bash} en \texttt{sudo} vanuit de gemounte shared folder. Voor Windows werd een afwijkende aanpak gebruikt, waarbij via SSH een PowerShell-script gestart werd met behulp van \texttt{psexec}. Deze opsplitsing was nodig om binnen één tool toch beide platformen op een consistente manier te kunnen ondersteunen.
+
+Een bijkomend aandachtspunt in deze sprint was het beheer van portforwardingregels. Voor het opzetten van een SSH-verbinding werd een tijdelijke NAT-regel toegevoegd, zodat de host via \texttt{127.0.0.1:2222} de VM kon bereiken. Vooraf werd gecontroleerd of er reeds conflicterende regels bestonden, zodat poortbotsingen vermeden konden worden. Aan het einde van de provisioning werd deze tijdelijke netwerkregel opnieuw verwijderd.
+
+Na deze sprint kon RustProv niet alleen een VM opstarten, maar ook automatisch verbinding maken via SSH en een provisioningscript uitvoeren op zowel Linux- als Windowsmachines. Daarmee werd de kern van de tool functioneel.
+
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij Linux-provisioning na sprint 2.}]
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=PowerShell,caption={Voorbeeld van console-uitvoer bij Windows-provisioning na sprint 2.}]
+
+\end{lstlisting}
+
+\section{Sprint 3: externe configuratie}
+
+In de derde sprint werd ondersteuning toegevoegd voor configuratie via een extern TOML-bestand. In de eerdere versies van RustProv werden verschillende instellingen nog hardgecodeerd in de broncode. Dat beperkte de flexibiliteit van de tool en maakte het moeilijker om verschillende testscenario's op een reproduceerbare manier te beheren.
+
+Door de introductie van TOML-konfiguratie konden VM-namen, besturingssysteemtypes, geheugeninstellingen, CPU-toewijzingen, boxkeuzes en bijkomende opties buiten de code worden beschreven. Deze configuratie werd ingelezen en omgezet naar interne datastructuren, waardoor éénzelfde uitvoerbare applicatie verschillende opstellingen kon behandelen zonder hercompilatie. In dezelfde sprint werd ook een \texttt{init}-functie toegevoegd om automatisch de vereiste mappenstructuur voor het project aan te maken.
+
+Na deze sprint kon RustProv op basis van een declaratief configuratiebestand een VM-opstelling interpreteren en de nodige voorbereidingen treffen voor verdere uitvoering. Daarmee werd de tool niet alleen functioneel, maar ook beter bruikbaar voor herhaalde experimenten en verschillende onderwijsopstellingen.
+
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na het inlezen van TOML-configuratie.}]
+
+
+\section{Sprint 4: uitbreidingen en gebruiksgemak}
+
+De vierde sprint stond in het teken van uitbreidingen die de tool praktischer maakten in reële gebruiksscenario's. Een eerste belangrijke toevoeging was ondersteuning voor snapshots. Hiermee kon vóór een provisioningsrun een herstelpunt worden gemaakt, zodat bij fouten sneller teruggekeerd kon worden naar een stabiele toestand zonder de volledige VM opnieuw op te bouwen.
+
+Daarnaast werd de code verder opgesplitst zodat bepaalde acties zowel voor één afzonderlijke VM als voor meerdere VM's konden worden toegepast. Ook de command-line interface werd verbeterd met \texttt{clap}, waardoor commando's en parameters duidelijker gestructureerd konden worden. In dezelfde sprint werd een afzonderlijke functie toegevoegd om de status van een VM op te vragen, zodat reeds actieve machines konden worden herkend en overgeslagen indien nodig. Verder werd optionele ondersteuning voorzien voor een bridge adapter als tweede netwerkinterface.
+
+Op het einde van deze sprint kon RustProv niet alleen configuraties inlezen en provisionen, maar ook scenario's met meerdere VM's beter beheren, snapshots aanmaken en meer bruikbare feedback geven aan de gebruiker via de CLI.
+
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer voor snapshots en statuscontrole na sprint 4.}]
+
+\end{lstlisting}
+
+\section{Sprint 5: foutafhandeling en robuustheid}
+
+De laatste sprint richtte zich op foutafhandeling, prioriteitsbeheer en robuuster gedrag in probleemsituaties. Daarbij werd een prioriteitsmechanisme toegevoegd zodat VM's in een vooraf bepaalde volgorde konden worden opgestart en geprovisioned. Dit was relevant voor scenario's waarin bepaalde machines pas correct konden functioneren nadat een andere reeds actief was. Om die reden werd ook gekozen voor \texttt{IndexMap}, zodat de invoervolgorde uit de configuratie behouden bleef.
+
+Daarnaast werden verschillende functies aangepast om correct om te gaan met reeds actieve VM's. De provisioner controleerde eerst de toestand van een machine en sloeg overbodige opstartstappen over wanneer de VM al draaide. Verder werd een \texttt{kill}-functie toegevoegd als noodoplossing voor situaties waarin VirtualBox niet correct reageerde. Ook werden stop- en remove-functionaliteiten uitgebreid met geforceerde varianten, zodat vastgelopen VM's toch beheersbaar bleven.
+
+Een belangrijk onderdeel van deze sprint was de verdere herwerking van Windows-provisioning. In de oorspronkelijke versie bleek scriptuitvoering onder een gewone gebruiker met administratieve rechten niet altijd voldoende. Daarom werd de aanpak aangepast zodat scripts via PSTools en \texttt{psexec} als SYSTEM-gebruiker konden worden uitgevoerd. Hierdoor werd Windows-provisioning betrouwbaarder voor systeemgerichte configuratiestappen.
+
+Na deze sprint beschikte RustProv over een bruikbare proof-of-concept implementatie die VM's kon aanmaken, opstarten, provisionen, beheren en in foutscenario's gecontroleerd kon reageren. Daarmee was de basis gelegd voor de daaropvolgende experimenten en benchmarkvergelijkingen. 
+
+\begin{lstlisting}[language=PowerShell,caption={Voorbeeld van console-uitvoer na sprint 5 met meerdere VM's en prioriteit.}]
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij foutafhandeling.}]
+
+\end{lstlisting}
