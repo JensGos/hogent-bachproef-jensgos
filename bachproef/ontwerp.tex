@@ -1,7 +1,98 @@
+\chapter{\IfLanguageName{dutch}{Ontwerp}{Design}}%
+\label{ch:ontwerp}
 
+Dit hoofdstuk beschrijft het ontwerp van RustProv als provisioner voor virtuele Windows- en Linuxomgevingen. De nadruk ligt op de basisfuncties van de tool, de provisioningflow, de platformafhankelijke uitvoering van scripts en de uitbreidingen die nodig zijn om de tool bruikbaar te maken in realistische onderwijsomgevingen. Het ontwerp vertrekt vanuit het principe dat een provisioner niet enkel VM's moet kunnen starten, maar ook reproduceerbaar en gecontroleerd een omgeving moet kunnen voorbereiden. 
+\section{Basisfunctionaliteit}
 
+RustProv werd ontworpen rond een beperkte set kernfuncties die samen de volledige provisioningworkflow ondersteunen. De belangrijkste kernfuncties zijn \texttt{start}, \texttt{provision}, \texttt{stop} en \texttt{remove}. Samen maken deze commando's het mogelijk om virtuele machines aan te maken, te configureren, af te sluiten en indien nodig opnieuw te verwijderen. Deze functies vormen de basis van de tool, omdat provisioning pas zinvol is wanneer een VM eerst correct kan worden opgestart en nadien op een gecontroleerde manier kan worden beheerd.
 
+\section{Gebruiksgemak en beheer}
 
+Naast de kernfuncties bevat RustProv verschillende ondersteunende functies die het gebruik van de tool eenvoudiger maken. De functies \texttt{state}, \texttt{ssh} en \texttt{init} verhogen vooral het gebruiksgemak en de controle over de virtuele omgeving. Met \texttt{state} kan de gebruiker opvragen of een VM actief is, \texttt{ssh} maakt rechtstreekse verbinding met de virtuele machine mogelijk en \texttt{init} zorgt voor het initialiseren van de nodige projectstructuur. Deze functies maken het beheer van de omgeving overzichtelijker en verminderen de kans op handmatige fouten.
 
+\section{Herstel- en noodfunctionaliteit}
 
-\subsection{uitbreidingen}
+Tot slot bevat RustProv ook functies die bedoeld zijn voor herstel en foutafhandeling. De functie \texttt{restore} laat toe om een eerder opgeslagen snapshot opnieuw in te laden, terwijl \texttt{kill} als noodmaatregel wordt gebruikt wanneer VirtualBox niet meer correct reageert. Deze uitbreidingen zijn niet strikt noodzakelijk voor de basiswerking van de tool, maar verhogen wel de betrouwbaarheid en robuustheid van het systeem.
+
+\subsection{Provisioningworkflow}
+
+De provisioningworkflow volgt een vaste volgorde. Eerst wordt de configuratie ingelezen, daarna wordt de VM aangemaakt of herkend, vervolgens wordt netwerktoegang geconfigureerd en pas daarna wordt via SSH een script uitgevoerd op de gastmachine. Deze volgorde is bewust gekozen, omdat provisioning enkel betrouwbaar kan verlopen wanneer de VM eerst bereikbaar is en de juiste netwerkparameters beschikbaar zijn. 
+
+Wanneer meerdere VM's moeten worden verwerkt, worden eerst alle VM's opgestart en daarna pas de provisioningtaken uitgevoerd. Hierdoor wordt de totale wachttijd beperkt, omdat de provisioning niet per machine afzonderlijk hoeft te wachten tot de VM volledig beschikbaar is. Dit is vooral nuttig in scenario's met meerdere onderlinge afhankelijkheden. 
+
+\section{SSH-verbinding}
+
+SSH vormt de centrale schakel tussen de host en de virtuele machine. RustProv gebruikt SSH om provisioningopdrachten op afstand uit te voeren. De gastmachine moet dus eerst bereikbaar worden gemaakt via het netwerk, doorgaans via port forwarding op poort 22, waarna de host verbinding kan maken met de VM. 
+
+Voordat de SSH-verbinding wordt opgezet, controleert RustProv eerst voor elke VM of poort 2222 reeds wordt doorgestuurd via port forwarding. Indien dat het geval is, wordt de bestaande regel verwijderd om conflicten te vermijden. Daarna wordt een nieuwe forwardingregel aangemaakt via poort 2222 op de host, zodat de VM op een gecontroleerde en voorspelbare manier bereikbaar is. Op die manier worden botsingen met andere virtuele machines of toepassingen die dezelfde poort gebruiken vermeden.
+
+\section{Linux- en Windowsprovisioning}
+
+RustProv splitst provisioning op in een Linux- en een Windows-pad. Die scheiding is nodig omdat beide besturingssystemen verschillende mechanismen gebruiken voor scriptuitvoering, rechtenbeheer en remote beheer. Een uniforme aanpak zou in de praktijk te veel beperkingen opleveren. 
+
+\subsection{Linuxprovisioning}
+
+Bij Linuxprovisioning wordt het script via SSH uitgevoerd in combinatie met \texttt{sudo}. Het script bevindt zich in de shared folder en wordt vanuit de shell gestart. Deze aanpak sluit goed aan bij klassieke Linuxadministratie, waar remote scripting via SSH een standaardmethode is.
+
+\subsection{Windowsprovisioning}
+
+Windowsprovisioning vereist een andere aanpak. De scripts worden niet op dezelfde manier uitgevoerd als bij Linux, omdat de standaard SSH-aanpak niet altijd volstaat voor systeemwijzigingen. Daarom wordt een aparte uitvoeringsmethode gebruikt die meer overeenkomt met de vereisten van Windowsbeheer. De tool voert eerst de nodige netwerkconfiguratie uit, waarna het script in de gepaste context wordt gestart. 
+
+\section{Uitbreidingen}
+
+Naast de basisfuncties bevat RustProv meerdere uitbreidingen die de tool robuuster en bruikbaarder maken. Deze uitbreidingen werden toegevoegd omdat een provisioner in een labo-omgeving niet alleen correct moet werken, maar ook moet kunnen herstellen van fouten en zich moet aanpassen aan verschillende scenario's. 
+
+\subsection{Snapshots}
+
+Snapshots werden toegevoegd om een antwoord te bieden op een praktisch probleem bij provisioning: wanneer een setup mislukt, moet men niet telkens opnieuw van nul beginnen. Door vóór de provisioning een snapshot te maken, kan de gebruiker terugkeren naar een stabiele toestand. Dat maakt testen sneller en verlaagt de impact van fouten tijdens de uitwerking. 
+
+\subsection{Priority}
+
+Het prioriteitsmechanisme laat toe om VM's in een vooraf bepaalde volgorde te verwerken. Dat is nuttig wanneer bepaalde systemen pas correct kunnen functioneren nadat andere systemen al beschikbaar zijn. De volgorde wordt bijgehouden in de configuratie, zodat de provisioning reproduceerbaar blijft. 
+
+\subsection{Stop, remove en restore}
+
+De functies \texttt{stop} en \texttt{remove} zijn voorzien om VM's gecontroleerd af te sluiten of volledig te verwijderen. De functie \texttt{restore} laat toe om een eerder opgeslagen snapshot terug te laden. Samen zorgen deze functies voor meer controle over de levenscyclus van een VM.
+
+\subsection{Kill}
+
+De \texttt{kill}-functie is een noodmaatregel voor situaties waarin VirtualBox niet meer correct reageert. Deze functie werd toegevoegd als een brute-force oplossing om vastgelopen toestanden te beëindigen wanneer normale stop- of beheercommando's geen resultaat meer opleveren. Op die manier kan RustProv alsnog terugkeren naar een werkbare toestand, zelfs wanneer de hypervisor niet meer op standaardcommando's reageert.
+\section{Ondersteuning voor Linux en Windows}
+
+RustProv werd ontworpen als een cross-platform toepassing die zowel op Linux als op Windows kan worden gecompileerd en uitgevoerd. Deze ondersteuning wordt gerealiseerd door functies conditioneel aan te passen op basis van het doelbesturingssysteem. Op die manier kan dezelfde codebasis op beide platformen gebruikt worden, terwijl platformgebonden onderdelen toch verschillend kunnen worden geïmplementeerd waar nodig. Hierdoor blijft de toepassing bruikbaar in uiteenlopende ontwikkel- en testomgevingen.
+
+Een voorbeeld hiervan is de implementatie van het beëindigen van VirtualBox-processen. Op Windows wordt hiervoor gebruikgemaakt van \texttt{taskkill}, terwijl op Linux \texttt{pkill} wordt aangeroepen. Door deze logica af te stemmen op het besturingssysteem kan RustProv op beide platformen op een gepaste manier omgaan met processen die geforceerd moeten worden stopgezet. 
+
+\begin{lstlisting}[language=Bash,caption={Voorbeeld van platformafhankelijke procesafsluiting.}]
+    use std::process::Command;
+    
+    pub fn main() {
+        if cfg!(target_os = "windows") {
+            let processes = ["VirtualBox.exe", "VBoxHeadless.exe", "VBoxSVC.exe"];
+            
+            for process in &processes {
+                let _ = Command::new("taskkill")
+                .args(&["/IM", process, "/F"])
+                .status();
+            }
+        } else {
+            let _ = Command::new("pkill")
+            .args(&["-9", "-f", "VBox|VirtualBox"])
+            .status();
+        }
+    }
+\end{lstlisting}
+
+RustProv gebruikt een externe TOML-configuratie om per virtuele machine de nodige instellingen vast te leggen. Elke configuratie wordt gekoppeld aan een naam, zodat de verschillende VM's in een opstelling duidelijk van elkaar onderscheiden kunnen worden.
+
+\begin{lstlisting}[language=bash,caption={Voorbeeld van een TOML-configuratie voor een virtuele machine.}]
+    [ubuntu-wordpress]
+    image = "ubuntu"
+    cores = 4
+    memory = 4096
+    script = ["02-wordpress-promtail.sh"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+    priority = 1
+\end{lstlisting}
+
+Naast die naam bevat het configuratiebestand verschillende velden die elk een specifieke rol hebben binnen de opstelling. Het veld \texttt{image} bepaalt op welke basisimage de virtuele machine wordt gebaseerd. De velden \texttt{cores} en \texttt{memory} geven respectievelijk het aantal processorkernen en de hoeveelheid werkgeheugen weer. Met \texttt{script} wordt een lijst van uit te voeren scripts opgegeven. Daarnaast kan optioneel een \texttt{bridgeNetwork} worden ingevuld om een bridge-adapter te configureren, en kan \texttt{priority} worden gebruikt om de volgorde van opstarten of provisionen te bepalen. Op die manier blijft de configuratie leesbaar en kan de provisioninglogica de juiste VM op basis van haar naam en instellingen verwerken.

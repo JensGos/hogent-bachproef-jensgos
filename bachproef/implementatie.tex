@@ -1,4 +1,6 @@
 \chapter{\IfLanguageName{dutch}{Implementatie}{Implementation}}%
+
+
 \label{ch:implementatie}
 
 Dit hoofdstuk beschrijft hoe RustProv stapsgewijs werd opgebouwd tijdens de verschillende sprints van het project. Waar het hoofdstuk Methodologie vooral het plan van aanpak op hoofdlijnen toelicht, ligt de focus hier op de concrete technische uitwerking. Per sprint wordt aangegeven welke functionaliteiten werden gerealiseerd, welke ontwerpkeuzes daarbij belangrijk waren en wat de tool op dat moment reeds kon uitvoeren.
@@ -29,7 +31,7 @@ Na deze sprint kon RustProv niet alleen een VM opstarten, maar ook automatisch v
 
 \end{lstlisting}
 
-\begin{lstlisting}[language=PowerShell,caption={Voorbeeld van console-uitvoer bij Windows-provisioning na sprint 2.}]
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij Windows-provisioning na sprint 2.}]
 
 \end{lstlisting}
 
@@ -42,7 +44,7 @@ Door de introductie van TOML-konfiguratie konden VM-namen, besturingssysteemtype
 Na deze sprint kon RustProv op basis van een declaratief configuratiebestand een VM-opstelling interpreteren en de nodige voorbereidingen treffen voor verdere uitvoering. Daarmee werd de tool niet alleen functioneel, maar ook beter bruikbaar voor herhaalde experimenten en verschillende onderwijsopstellingen.
 
 \begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na het inlezen van TOML-configuratie.}]
-
+\end{lstlisting}
 
 \section{Sprint 4: uitbreidingen en gebruiksgemak}
 
@@ -66,7 +68,7 @@ Een belangrijk onderdeel van deze sprint was de verdere herwerking van Windows-p
 
 Na deze sprint beschikte RustProv over een bruikbare proof-of-concept implementatie die VM's kon aanmaken, opstarten, provisionen, beheren en in foutscenario's gecontroleerd kon reageren. Daarmee was de basis gelegd voor de daaropvolgende experimenten en benchmarkvergelijkingen. 
 
-\begin{lstlisting}[language=PowerShell,caption={Voorbeeld van console-uitvoer na sprint 5 met meerdere VM's en prioriteit.}]
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na sprint 5 met meerdere VM's en prioriteit.}]
 
 \end{lstlisting}
 

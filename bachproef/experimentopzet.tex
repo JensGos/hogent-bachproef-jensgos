@@ -1,5 +1,5 @@
-\section{Experimentopzet}
-\label{sec:experimentopzet}
+\chapter{\IfLanguageName{dutch}{Experimentopzet}{Experimental Setup}}%
+\label{ch:experimentopzet}
 
 Om de werking van RustProv te evalueren, werd een testomgeving opgezet die aansluit bij een realistische onderwijscontext. Daarbij werd gekozen voor twee afzonderlijke scenario's: een Windows-omgeving en een Linux-omgeving. Beide omgevingen zijn gebaseerd op opstellingen uit het vak SDP, zodat de experimenten zoveel mogelijk aansluiten bij een bestaande en relevante praktijksituatie binnen de opleiding.
 
@@ -15,7 +15,7 @@ Als eerste testgeval werd één afzonderlijke Windows-VM gebruikt. Deze test had
 
 \paragraph{Script 1}
 Het derde 
-\begin{lstlisting}[language=PowerShell,caption={Provisioningscript voor de Windows-client.}]
+\begin{lstlisting}[language=bash,caption={Provisioningscript voor de Windows-client.}]
     % script 3 hier invoegen
 \end{lstlisting}
 
@@ -28,20 +28,20 @@ Voor elke virtuele machine werd een afzonderlijk provisioningscript voorzien. Op
 \paragraph{Script 1}
 Het eerste 
 
-\begin{lstlisting}[language=PowerShell,caption={Provisioningscript voor Windows Server 1.}]
+\begin{lstlisting}[language=bash,caption={Provisioningscript voor Windows Server 1.}]
     % script 1 hier invoegen
 \end{lstlisting}
 
 \paragraph{Script 2}
 Het tweede script 
 
-\begin{lstlisting}[language=PowerShell,caption={Provisioningscript voor Windows Server 2.}]
+\begin{lstlisting}[language=bash,caption={Provisioningscript voor Windows Server 2.}]
     % script 2 hier invoegen
 \end{lstlisting}
 
 \paragraph{Script 3}
 Het derde 
-\begin{lstlisting}[language=PowerShell,caption={Provisioningscript voor de Windows-client.}]
+\begin{lstlisting}[language=bash,caption={Provisioningscript voor de Windows-client.}]
     % script 3 hier invoegen
 \end{lstlisting}
 
@@ -69,6 +69,7 @@ Daarnaast werd ook een Linux-opstelling met drie virtuele machines getest. Deze 
 
 Voor elke Linux-VM werd een apart provisioningscript voorzien. Daardoor kon elke machine een eigen configuratie en rol krijgen binnen de bredere testomgeving. Deze aanpak maakt het mogelijk om te beoordelen of RustProv de juiste scriptstappen op de juiste machine uitvoert en of meerdere Linux-systemen correct na elkaar of gezamenlijk verwerkt kunnen worden. 
 
+\newpage
 \subsubsection{Linux-script 1: database en Loki}
 
 Dit script installeert de databaseomgeving en Loki, zodat loggegevens centraal kunnen worden opgeslagen en later geanalyseerd. Het vormt de basislaag van de monitoringopstelling.
@@ -146,6 +147,7 @@ Dit script installeert de databaseomgeving en Loki, zodat loggegevens centraal k
     sudo systemctl enable --now loki
 \end{lstlisting}
 
+\newpage
 \subsubsection{Linux-script 2: WordPress en Promtail}
 
 Dit script installeert WordPress en Promtail. WordPress levert de webtoepassing, terwijl Promtail de logs van het systeem doorstuurt naar Loki voor centrale logverzameling.
@@ -221,6 +223,7 @@ Dit script installeert WordPress en Promtail. WordPress levert de webtoepassing,
     sudo systemctl enable --now promtail
 \end{lstlisting}
 
+\newpage
 \subsubsection{Linux-script 3: monitoring met Grafana}
 
 Dit script installeert Grafana en maakt de monitoringomgeving volledig. Grafana gebruikt de data uit Loki om dashboards en logoverzichten weer te geven.
@@ -250,3 +253,19 @@ Dit script installeert Grafana en maakt de monitoringomgeving volledig. Grafana 
     
     sudo systemctl restart grafana-server
 \end{lstlisting}
+
+
+
+TOE TE VOEGEN
+1 LINUX
+MULTI LINUX
+1 WINDOWS
+MULTI WINDOWS
+
+Tijd testen na elkaar
+
+Tijd testen apart -> aanmaken vm -> daarna provisionen niet aanmaken en provisoinen
+
+
+
+TOML voor rustpov Vagrantfile voor vagrant voor de config
