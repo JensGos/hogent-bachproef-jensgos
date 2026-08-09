@@ -48,3 +48,75 @@
 %  \end{tabular}
 %  \caption[Voorbeeld tabel]{\label{tab:example}Voorbeeld van een tabel.}
 %\end{table}
+Dit hoofdstuk beschrijft de stand van zaken binnen het onderzoeksdomein van virtuele machine provisioning. Eerst wordt toegelicht wat provisioning inhoudt en welke rol een provisioner speelt bij het automatisch opbouwen en configureren van IT-omgevingen. Vervolgens wordt Infrastructure as Code besproken als bredere methodologie waarin configuratiebestanden en automatisering worden gebruikt. Daarna wordt Rust behandeld als programmeertaal voor systeemgerichte software. Vervolgens wordt de educatieve context van virtuele machines besproken. Tot slot wordt RustProv geïntroduceerd als de concrete toepassing van deze concepten binnen deze bachelorproef.
+
+Deze opbouw gaat van algemene begrippen naar de specifieke oplossing die in dit onderzoek wordt ontwikkeld. Hierdoor beschikt de lezer eerst over de nodige achtergrond voordat de werking en het ontwerp van RustProv worden toegelicht.
+
+\section{Provisioner en provisioning}
+
+Provisioning verwijst naar het voorbereiden en beschikbaar maken van IT-infrastructuur. Dit kan onder meer betrekking hebben op servers, virtuele machines, netwerken, opslag en toegangsrechten. Bij geautomatiseerde provisioning worden deze stappen uitgevoerd door een tool, configuratiebestand of script in plaats van door een gebruiker die elke stap handmatig uitvoert. Hierdoor kan een omgeving sneller en consistenter worden opgebouwd \autocite{RedHat2023}.
+
+Een provisioner is een toepassing die infrastructuur automatisch kan aanmaken en voorbereiden voor gebruik. In het geval van virtuele machines omvat dit bijvoorbeeld het aanmaken of herkennen van een VM, het instellen van hardware- en netwerkparameters, het starten van de machine en het uitvoeren van configuratiestappen op het gastbesturingssysteem \autocite{RedHat2023,HashiCorp2025}. Een provisioner beperkt zich dus niet tot het beheren van de levenscyclus van een VM, maar zorgt er ook voor dat de machine in een bruikbare toestand wordt achtergelaten.
+
+Een belangrijk kenmerk van geautomatiseerde provisioning is herhaalbaarheid \autocite{IBM2025}. Wanneer dezelfde configuratie meerdere keren wordt uitgevoerd, moet dit in principe leiden tot een gelijkaardige omgeving. Dit is relevant in situaties waarin dezelfde omgeving door verschillende gebruikers of op verschillende momenten opnieuw moet worden opgebouwd. Een externe configuratie en geautomatiseerde scripts helpen om verschillen tussen manuele installaties te beperken.
+
+Provisioning bestaat doorgaans uit meerdere opeenvolgende stappen. Eerst wordt de infrastructuur aangemaakt of geselecteerd. Vervolgens worden de nodige hardware- en netwerkparameters ingesteld. Daarna wordt de machine gestart en bereikbaar gemaakt, waarna configuratiescripts of andere installatiestappen op het gastbesturingssysteem kunnen worden uitgevoerd.
+
+Vagrant is een voorbeeld van een bestaande tool die virtuele ontwikkel- en labo-omgevingen kan automatiseren. Vagrant ondersteunt provisioners waarmee software kan worden geïnstalleerd, configuraties kunnen worden aangepast en scripts op een gastmachine kunnen worden uitgevoerd \autocite{HashiCorp2025}. Provisioning kan onder andere plaatsvinden tijdens \texttt{vagrant up}, via \texttt{vagrant provision} of wanneer een expliciete provisioningsoptie wordt meegegeven \autocite{HashiCorp2025}.
+
+Hoewel een provisioner verschillende taken kan automatiseren, blijft de uiteindelijke werking afhankelijk van de virtualisatieomgeving, de netwerkconfiguratie en het gastbesturingssysteem. Daarom moet een provisioner niet alleen rekening houden met de gewenste configuratie, maar ook met de manier waarop VM's bereikbaar worden gemaakt en scripts op verschillende platformen worden uitgevoerd.
+
+\section{Infrastructure as Code}
+
+Infrastructure as Code, afgekort als IaC, is een aanpak waarbij infrastructuur wordt beschreven en beheerd door middel van configuratiebestanden en programmatische definities \autocite{IBM2025}. In plaats van infrastructuur volledig handmatig te configureren, wordt de gewenste toestand beschreven in code of in een declaratief configuratiebestand. Deze configuratie kan daarna automatisch worden toegepast \autocite{IBM2025}.
+
+Het gebruik van IaC heeft verschillende gevolgen voor de manier waarop infrastructuur wordt beheerd. Configuraties kunnen worden bijgehouden, hergebruikt en opnieuw uitgevoerd. Daardoor wordt het eenvoudiger om wijzigingen te controleren en om een omgeving opnieuw op te bouwen wanneer dat nodig is \autocite{IBM2025}. De configuratie vormt bovendien een expliciete beschrijving van de gewenste toestand van de omgeving \autocite{IBM2025}.
+
+Binnen IaC kan een onderscheid worden gemaakt tussen verschillende soorten tools. Provisioningtools richten zich op het creëren en beschikbaar maken van infrastructuur. Configuratiemanagementtools richten zich eerder op het installeren en configureren van software op bestaande systemen. Orchestrationtools bepalen daarnaast vaak de volgorde en samenwerking tussen verschillende systemen of taken.
+
+Een configuratiebestand kan zowel infrastructuurparameters als configuratiestappen beschrijven. Zo kunnen bijvoorbeeld de naam van een VM, de hoeveelheid geheugen, het aantal processorkernen, de netwerkconfiguratie en de uit te voeren scripts in één configuratie worden vastgelegd. Hierdoor wordt de relatie tussen de gewenste omgeving en de uitvoering ervan explicieter.
+
+Voor dit onderzoek is vooral het provisioninggedeelte van IaC relevant. De te ontwikkelen tool gebruikt een externe configuratie om VM's te beschrijven en de provisioningworkflow aan te sturen. De configuratie vormt daarmee de invoer voor het automatisch aanmaken, starten en provisionen van de virtuele machines.
+
+\section{Rust als programmeertaal}
+
+Rust is een programmeertaal die gericht is op het ontwikkelen van betrouwbare en efficiënte software. Een belangrijk onderdeel van Rust is het ownershipmodel. Dit model, samen met borrowing en lifetimes, laat de compiler geheugenveiligheid controleren tijdens het compileren. Volgens de officiële Rust-documentatie kan Rust hierdoor geheugenveiligheid garanderen zonder gebruik te maken van een garbage collector \autocite{Rust2025}.
+
+Het ownershipmodel bepaalt welke variabele eigenaar is van een waarde en wanneer die waarde automatisch wordt vrijgegeven. Borrowing maakt het mogelijk om tijdelijk naar data te verwijzen zonder het eigenaarschap over te dragen. Deze regels worden door de compiler gecontroleerd voordat het programma wordt uitgevoerd \autocite{Rust2025}.
+
+Rust is relevant voor het ontwikkelen van systeemgerichte software omdat programma's vaak rechtstreeks moeten samenwerken met processen, bestanden, netwerkverbindingen en het onderliggende besturingssysteem. Daarbij is niet alleen functionaliteit belangrijk, maar ook voorspelbaar gedrag wanneer een externe actie mislukt.
+
+Voor de te ontwikkelen provisioner is het bovendien belangrijk dat de toepassing op verschillende hostbesturingssystemen kan worden gecompileerd en uitgevoerd. Platformafhankelijke onderdelen, zoals het beëindigen van processen of het bepalen van de gebruikersmap, kunnen daarbij afzonderlijk per besturingssysteem worden geïmplementeerd.
+
+De provisioner gebruikt daarnaast een virtualisatieplatform met een commandline-interface om virtuele machines te beheren. VirtualBox biedt hiervoor het programma \texttt{VBoxManage}. Met deze interface kunnen VM's vanuit het hostbesturingssysteem via commando's worden aangemaakt, geconfigureerd, gestart en beheerd \autocite{Oracle2022}.
+
+\section{Educatieve context}
+
+Virtuele machines worden in onderwijsomgevingen gebruikt om studenten een gecontroleerde en geïsoleerde technische omgeving aan te bieden. Daardoor kunnen studenten experimenteren met besturingssystemen, netwerken en servertoepassingen zonder rechtstreeks wijzigingen aan te brengen aan de fysieke hostomgeving.
+
+Een uitdaging binnen deze context is dat de beschikbare hardware en tijd vaak beperkt zijn. Onderzoek naar het gebruik van virtuele omgevingen voor onderwijs toont aan dat onder meer performantie, opslag, netwerkcommunicatie en de keuze van virtualisatieplatformen een rol spelen bij het opbouwen van bruikbare labo-omgevingen \autocite{Robison2012}.
+
+Een provisioningtool kan in deze context helpen om een vaste beginsituatie voor studenten te creëren. Wanneer de VM's en scripts automatisch worden opgebouwd, moeten studenten minder tijd besteden aan handmatige installatie en configuratie. De beschikbare lestijd kan daardoor meer gericht worden op de inhoud van de oefening.
+
+Voor een provisioner binnen een onderwijscontext zijn daarom niet alleen technische mogelijkheden belangrijk. De tool moet ook eenvoudig configureerbaar zijn, duidelijke feedback geven en kunnen omgaan met scenario's met één of meerdere virtuele machines. Herhaalbaarheid, voorspelbaarheid en beperkte manuele tussenkomst zijn hierbij belangrijke eigenschappen.
+
+\section{RustProv}
+
+RustProv is de provisioner die binnen deze bachelorproef wordt ontworpen en gerealiseerd. De tool combineert de eerder beschreven concepten van provisioning, Infrastructure as Code en systeemgerichte softwareontwikkeling. RustProv richt zich op het automatisch opbouwen en provisionen van virtuele Windows- en Linuxomgevingen met VirtualBox als virtualisatieplatform.
+
+De gebruiker beschrijft de gewenste VM-opstelling in een extern TOML-configuratiebestand. Daarin kunnen onder andere de naam van de VM, de gebruikte image, het aantal processorkernen, de hoeveelheid geheugen, de uit te voeren scripts en optionele netwerk- of prioriteitsinstellingen worden vastgelegd. Hierdoor blijft de configuratie buiten de broncode en kunnen verschillende testopstellingen worden gebruikt zonder het programma opnieuw te compileren.
+
+Na het inlezen van de configuratie maakt RustProv de virtuele machines aan of herkent het machines die al bestaan. Vervolgens worden de VM-instellingen aangepast en worden de virtuele schijven gekoppeld. Via \texttt{VBoxManage} kunnen deze beheeracties vanuit de commandline worden uitgevoerd \autocite{Oracle2022}.
+
+Wanneer meerdere VM's worden gebruikt, kan RustProv de machines eerst opstarten en daarna de provisioning uitvoeren. De configuratie kan ook een prioriteit bevatten, zodat VM's in een vooraf bepaalde volgorde worden verwerkt. Dit is relevant wanneer een scenario uit verschillende systemen bestaat die onderling afhankelijk zijn.
+
+Na het opstarten wordt netwerktoegang voorzien via port forwarding. RustProv gebruikt SSH om verbinding te maken met de gastmachine en om provisioningopdrachten uit te voeren. Voor Linux worden scripts via een shellomgeving uitgevoerd. Voor Windows wordt een afzonderlijk uitvoeringspad gebruikt omdat de scriptuitvoering en het rechtenbeheer van beide platformen van elkaar verschillen.
+
+RustProv ondersteunt daarnaast functies voor statuscontrole, snapshots, herstellen, stoppen, verwijderen en foutafhandeling. Deze functies zorgen ervoor dat de tool niet alleen een VM kan opstarten, maar ook de levenscyclus van de omgeving kan beheren. Hierdoor sluit de functionaliteit aan bij de eerder beschreven kenmerken van een provisioner.
+
+\section{Samenvatting}
+
+Provisioning bestaat uit het automatisch opbouwen en voorbereiden van IT-infrastructuur \autocite{RedHat2023}. Infrastructure as Code biedt een manier om de gewenste toestand van deze infrastructuur in configuratiebestanden vast te leggen en herhaalbaar toe te passen \autocite{IBM2025}. Rust biedt een geschikte basis voor de ontwikkeling van systeemgerichte software dankzij het ownershipmodel en de compile-time controle van geheugenveiligheid \autocite{Rust2025}.
+
+Binnen deze bachelorproef worden deze concepten toegepast in RustProv. De tool combineert VirtualBox-beheer, externe TOML-configuratie, SSH-gebaseerde scriptuitvoering en ondersteuning voor virtuele Windows- en Linuxomgevingen. De volgende hoofdstukken bouwen hierop voort door eerst de requirements en de gekozen tools te bespreken en daarna het ontwerp en de implementatie van RustProv toe te lichten.
+

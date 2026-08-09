@@ -39,7 +39,7 @@ Na deze sprint kon RustProv niet alleen een VM opstarten, maar ook automatisch v
 
 In de derde sprint werd ondersteuning toegevoegd voor configuratie via een extern TOML-bestand. In de eerdere versies van RustProv werden verschillende instellingen nog hardgecodeerd in de broncode. Dat beperkte de flexibiliteit van de tool en maakte het moeilijker om verschillende testscenario's op een reproduceerbare manier te beheren.
 
-Door de introductie van TOML-konfiguratie konden VM-namen, besturingssysteemtypes, geheugeninstellingen, CPU-toewijzingen, boxkeuzes en bijkomende opties buiten de code worden beschreven. Deze configuratie werd ingelezen en omgezet naar interne datastructuren, waardoor éénzelfde uitvoerbare applicatie verschillende opstellingen kon behandelen zonder hercompilatie. In dezelfde sprint werd ook een \texttt{init}-functie toegevoegd om automatisch de vereiste mappenstructuur voor het project aan te maken.
+Door de introductie van TOML-configuratie konden VM-namen, besturingssysteemtypes, geheugeninstellingen, CPU-toewijzingen, boxkeuzes en bijkomende opties buiten de code worden beschreven. Deze configuratie werd ingelezen en omgezet naar interne datastructuren, waardoor éénzelfde uitvoerbare applicatie verschillende opstellingen kon behandelen zonder hercompilatie. In dezelfde sprint werd ook een \texttt{init}-functie toegevoegd om automatisch de vereiste mappenstructuur voor het project aan te maken.
 
 Na deze sprint kon RustProv op basis van een declaratief configuratiebestand een VM-opstelling interpreteren en de nodige voorbereidingen treffen voor verdere uitvoering. Daarmee werd de tool niet alleen functioneel, maar ook beter bruikbaar voor herhaalde experimenten en verschillende onderwijsopstellingen.
 
@@ -66,7 +66,7 @@ Daarnaast werden verschillende functies aangepast om correct om te gaan met reed
 
 Een belangrijk onderdeel van deze sprint was de verdere herwerking van Windows-provisioning. In de oorspronkelijke versie bleek scriptuitvoering onder een gewone gebruiker met administratieve rechten niet altijd voldoende. Daarom werd de aanpak aangepast zodat scripts via PSTools en \texttt{psexec} als SYSTEM-gebruiker konden worden uitgevoerd. Hierdoor werd Windows-provisioning betrouwbaarder voor systeemgerichte configuratiestappen.
 
-Na deze sprint beschikte RustProv over een bruikbare proof-of-concept implementatie die VM's kon aanmaken, opstarten, provisionen, beheren en in foutscenario's gecontroleerd kon reageren. Daarmee was de basis gelegd voor de daaropvolgende experimenten en benchmarkvergelijkingen. 
+Na deze sprint beschikte RustProv over een bruikbare proof of concept implementatie die VM's kon aanmaken, opstarten, provisionen, beheren en in foutscenario's gecontroleerd kon reageren. Daarmee was de basis gelegd voor de daaropvolgende experimenten en benchmarkvergelijkingen. 
 
 \begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na sprint 5 met meerdere VM's en prioriteit.}]
 
