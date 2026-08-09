@@ -1,109 +1,204 @@
 \chapter{\IfLanguageName{dutch}{Experimentopzet}{Experimental Setup}}%
 \label{ch:experimentopzet}
 
-Om de werking van RustProv te evalueren, werd een testomgeving opgezet die aansluit bij een realistische onderwijscontext. Daarbij werd gekozen voor twee afzonderlijke scenario's: een Windows-omgeving en een Linux-omgeving. Beide omgevingen zijn gebaseerd op opstellingen uit het vak SDP, zodat de experimenten zoveel mogelijk aansluiten bij een bestaande en relevante praktijksituatie binnen de opleiding.
+Om de werking van RustProv te evalueren, werd een testomgeving opgezet die aansluit bij een realistische onderwijscontext. Daarbij werd gekozen voor twee afzonderlijke scenario's: een Windows-omgeving en een Linux-omgeving. De Windowsomgeving is gebaseerd op een opstelling uit het vak Windows Server 2, terwijl de Linuxomgeving gebaseerd is op een opstelling uit het vak Software Development Project (SDP). Op die manier sluiten de experimenten aan bij bestaande en relevante praktijksituaties binnen de opleiding.
 
-De keuze voor deze opzet maakt het mogelijk om RustProv te testen in scenario's met meerdere virtuele machines, onderlinge afhankelijkheden en afzonderlijke provisioningscripts per machine. Op die manier kan niet alleen worden nagegaan of de tool technisch correct werkt, maar ook of de gekozen aanpak bruikbaar is in een onderwijs- en labo-omgeving.
+De testomgeving wordt gebruikt om RustProv te evalueren en te vergelijken met Vagrant als bestaande provisioningoplossing. Voor beide tools worden dezelfde virtuele machines, besturingssystemen, hardwareconfiguraties, netwerkinstellingen en provisioningscripts gebruikt. Hierdoor kunnen beide oplossingen onder zo gelijk mogelijke omstandigheden worden vergeleken.
+
+De keuze voor deze opzet maakt het mogelijk om RustProv te testen in scenario's met één of meerdere virtuele machines, onderlinge afhankelijkheden en afzonderlijke provisioningscripts per machine. Op die manier kan niet alleen worden nagegaan of de tool technisch correct werkt, maar ook of RustProv bruikbaar is in een onderwijs- en labo-omgeving. De scenario's worden bovendien zo opgesteld dat zowel eenvoudige als complexere configuraties kunnen worden geëvalueerd.
+
+De experimenten worden uitgevoerd voor één Linux-VM, meerdere Linux-VM's, één Windows-VM en meerdere Windows-VM's. Voor elk scenario wordt een overeenkomstige configuratie voorzien voor RustProv en Vagrant. De resultaten van deze experimenten worden in het volgende hoofdstuk weergegeven en besproken. Ook de manier waarop de verschillende tijdsmetingen worden uitgevoerd, wordt in het volgende hoofdstuk toegelicht.
 
 \section{Windows-omgeving}
 
-Voor het Windows-scenario werd een omgeving uitgewerkt die gebaseerd is op een SDP-opstelling met meerdere samenwerkende systemen binnen één netwerkstructuur. Deze omgeving werd gebruikt om na te gaan of RustProv ook in een meer complexe Windows-context correct kan functioneren.
+Voor het Windows-scenario werd een omgeving uitgewerkt die gebaseerd is op een opstelling uit het vak Windows Server 2. Deze omgeving bevat meerdere samenwerkende Windows-systemen binnen één netwerkstructuur. Ze wordt gebruikt om na te gaan of RustProv zowel een afzonderlijke Windows-VM als een complexere opstelling met meerdere Windows-systemen kan verwerken.
 
-\subsection{Enkele virtuele machine}
+De Windowsomgeving wordt ook met Vagrant opgebouwd. Hierbij worden dezelfde VM-rollen, provisioningscripts en netwerkconfiguratie gebruikt als bij de RustProv-opstelling. Op die manier wordt een vergelijkingsbasis gecreëerd waarbij het verschil tussen beide oplossingen zo weinig mogelijk wordt beïnvloed door verschillen in de testomgeving.
 
-Als eerste testgeval werd één afzonderlijke Windows-VM gebruikt. Deze test had als doel na te gaan of RustProv in staat is een enkele Windows-machine correct aan te maken, op te starten en te provisionen. In deze opstelling werd een Windows-client gebruikt waarop de nodige beheertools, waaronder RSAT, via een provisioningscript werden voorbereid. Deze configuratie vormt een beperkt maar representatief scenario voor het evalueren van de basisfunctionaliteit van de provisioner binnen een Windows-omgeving.
+\subsection{Eén virtuele machine}
 
-\paragraph{Script 1}
-Het derde 
+windows
+
+\paragraph{Provisioningscript}
+
+Het provisioningscript wordt gebruikt om de Windows-client voor te bereiden en de vereiste beheertools te installeren.
+
 \begin{lstlisting}[language=bash,caption={Provisioningscript voor de Windows-client.}]
-    % script 3 hier invoegen
+    % Het Windows-provisioningscript wordt hier ingevoegd.
 \end{lstlisting}
 
 \subsection{Meerdere virtuele machines}
 
-Naast het enkelvoudige testgeval werd ook een uitgebreidere Windows-opstelling gebruikt met drie virtuele machines: twee servers en één client. Deze configuratie is gebaseerd op een SDP-scenario waarin meerdere Windows-systemen onderling samenwerken. Daardoor kan niet alleen de provisioning van afzonderlijke machines worden getest, maar ook de opstartvolgorde en de samenhang tussen verschillende systemen binnen één omgeving.
+windows
 
-Voor elke virtuele machine werd een afzonderlijk provisioningscript voorzien. Op die manier kon elke machine een eigen rol en configuratie krijgen, terwijl de provisioner toch één samenhangend scenario moest uitvoeren. Deze opdeling maakt het mogelijk om per systeem te controleren of de toegewezen configuratie correct werd toegepast.
+\paragraph{Provisioningscript voor Windows Server 1}
 
-\paragraph{Script 1}
-Het eerste 
+Het eerste script configureert Windows Server 1 en bereidt de machine voor op de rol die deze binnen de testomgeving vervult.
 
 \begin{lstlisting}[language=bash,caption={Provisioningscript voor Windows Server 1.}]
-    % script 1 hier invoegen
+    % Het provisioningscript voor Windows Server 1 wordt hier ingevoegd.
 \end{lstlisting}
 
-\paragraph{Script 2}
-Het tweede script 
+\paragraph{Provisioningscript voor Windows Server 2}
+
+Het tweede script configureert Windows Server 2 en voorziet de instellingen die nodig zijn voor de samenwerking met de andere VM's.
 
 \begin{lstlisting}[language=bash,caption={Provisioningscript voor Windows Server 2.}]
-    % script 2 hier invoegen
+    % Het provisioningscript voor Windows Server 2 wordt hier ingevoegd.
 \end{lstlisting}
 
-\paragraph{Script 3}
-Het derde 
-\begin{lstlisting}[language=bash,caption={Provisioningscript voor de Windows-client.}]
-    % script 3 hier invoegen
+\paragraph{Provisioningscript voor de Windows-client}
+
+Het derde script configureert de Windows-client binnen de meerledige Windowsomgeving.
+
+\begin{lstlisting}[language=bash,caption={Provisioningscript voor de Windows-client in de meerledige opstelling.}]
+    % Het provisioningscript voor de Windows-client wordt hier ingevoegd.
 \end{lstlisting}
 
 \section{Linux-omgeving}
 
-Voor het Linux-scenario werd een opstelling voorzien met drie virtuele machines op basis van AlmaLinux. Deze omgeving is gebaseerd op een configuratie uit het vak SDP en werd gekozen omdat ze representatief is voor een typische Linux-opstelling binnen de opleiding. Daardoor sluit dit experiment aan bij de concrete onderwijscontext waarvoor RustProv bedoeld is.
+Voor het Linux-scenario werd een opstelling voorzien met drie virtuele machines op basis van AlmaLinux. Deze omgeving is gebaseerd op een configuratie uit het vak Software Development Project (SDP) en werd gekozen omdat ze representatief is voor een typische Linux-opstelling binnen de opleiding.
 
-\subsection{Enkele virtuele machine}
+De Linuxomgeving wordt zowel met RustProv als met Vagrant opgebouwd. Voor beide oplossingen worden dezelfde AlmaLinux-images, IP-adressen, hardware-instellingen en provisioningscripts gebruikt. Hierdoor kan de werking van RustProv onder dezelfde omstandigheden worden vergeleken met de bestaande Vagrant-aanpak.
 
-Als eerste Linux-testgeval werd één afzonderlijke AlmaLinux-VM gebruikt. Deze test had als doel te verifiëren of RustProv een enkele Linux-machine correct kan opstarten en provisionen. In deze configuratie werd een eenvoudige serveropstelling gebruikt waarbij onder andere Apache werd voorbereid via een provisioningscript. Dit beperkte scenario laat toe de basiswerking van de Linux-provisioning afzonderlijk te evalueren. 
+\subsection{Eén virtuele machine}
 
+Als eerste Linux-testgeval wordt één afzonderlijke AlmaLinux-VM gebruikt. Deze test heeft als doel te verifiëren of RustProv een enkele Linux-machine correct kan opstarten en provisionen. In tegenstelling tot de meerledige Linuxopstelling wordt in dit scenario een eenvoudig Bash-script gebruikt, zodat de basiswerking van de Linuxprovisioning afzonderlijk kan worden gecontroleerd.
 
-\paragraph{Script 1}
-Het eerste script 
-\begin{lstlisting}[language=bash,caption={Provisioningscript voor Linux VM 1.}]
-    # script 1 hier invoegen
+\paragraph{Provisioningscript voor één Linux-VM}
+
+Het script voert enkele eenvoudige opdrachten uit op de gastmachine. Eerst wordt een tekstbericht naar de console geschreven. Vervolgens wordt een bestand aangemaakt waarin een tweede tekstbericht wordt opgeslagen. Ten slotte wordt de inhoud van dit bestand opnieuw weergegeven op de console. Op basis van deze uitvoer kan worden gecontroleerd of het script effectief op de juiste virtuele machine werd uitgevoerd. De configuratie van dit scenario wordt weergegeven in Listing~\ref{lst:bplinux}.
+
+\begin{lstlisting}[language=bash,caption={Eenvoudig provisioningscript voor één Linux-VM.},label={lst:bplinux}]
+    #!/usr/bin/env bash
+    echo "Hello, World!"
+    echo "Hello, World from a file!" > ~/hello.txt
+    cat ~/hello.txt
 \end{lstlisting}
 
-\paragraph{Script 2}
-Het tweede script 
+Voor het experiment met één Linux-VM werd dezelfde configuratie opgesteld voor RustProv en Vagrant. Beide gebruiken dezelfde AlmaLinux-image, VM-naam, hardware-instellingen, netwerkadapter en het provisioningscript \texttt{00-hello.sh}. De configuraties worden weergegeven in Listing~\ref{lst:rustprov-linux-config-one} en Listing~\ref{lst:vagrant-linux-config-one}.
+
+\begin{lstlisting}[language=bash,caption={RustProv-configuratie voor één Linux-VM.},label={lst:rustprov-linux-config-one}]
+[linuxbp]
+image = "almalinux9"
+cores = 4
+memory = 4096
+script = ["00-hello.sh"]
+bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=ruby,caption={Vagrant-configuratie voor één Linux-VM},label={lst:vagrant-linux-config-one}]
+Vagrant.configure("2") do |config|
+config.vm.define "linuxbp" do |linux|
+linux.vm.box = "almalinux/9"
+linux.vm.box_version = "9.7.20260518"
+linux.vm.hostname = "linuxbp"
+linux.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller", auto_config: false
+linux.vm.provider "virtualbox" do |vb|
+vb.memory = 4096
+vb.cpus = 4
+end
+linux.vm.provision "shell", path: "scripts/00-hello.sh"
+end
+end
+
+\end{lstlisting}
+
+
+
+
+
 
 \subsection{Meerdere virtuele machines}
 
-Daarnaast werd ook een Linux-opstelling met drie virtuele machines getest. Deze configuratie sluit aan bij een SDP-omgeving waarin meerdere AlmaLinux-systemen gelijktijdig worden ingezet. Het gebruik van meerdere Linux-VM's maakt het mogelijk om RustProv te evalueren in een scenario met meerdere nodes, afzonderlijke scripts en een gezamenlijke uitvoeringscontext.
+Daarnaast wordt ook een Linux-opstelling met drie virtuele machines getest. Deze configuratie sluit aan bij een SDP-omgeving waarin meerdere AlmaLinux-systemen gelijktijdig worden ingezet. Het gebruik van meerdere Linux-VM's maakt het mogelijk om RustProv te evalueren in een scenario met meerdere nodes, afzonderlijke scripts en een gezamenlijke uitvoeringscontext.
 
-Voor elke Linux-VM werd een apart provisioningscript voorzien. Daardoor kon elke machine een eigen configuratie en rol krijgen binnen de bredere testomgeving. Deze aanpak maakt het mogelijk om te beoordelen of RustProv de juiste scriptstappen op de juiste machine uitvoert en of meerdere Linux-systemen correct na elkaar of gezamenlijk verwerkt kunnen worden. 
+De drie VM's hebben elk een eigen rol binnen de testomgeving. De eerste VM wordt gebruikt voor de database en Loki. De tweede VM bevat de WordPress-installatie en Promtail. De derde VM wordt gebruikt voor de monitoring met Grafana. De configuratie van deze VM's is onderling verbonden, omdat WordPress gebruikmaakt van de database op de eerste VM en Grafana de loggegevens uit Loki kan gebruiken.
+
+Voor elke Linux-VM wordt een apart provisioningscript voorzien. Daardoor krijgt elke machine een eigen configuratie en rol binnen de bredere testomgeving. Deze aanpak maakt het mogelijk om te beoordelen of RustProv de juiste scriptstappen op de juiste machine uitvoert en of meerdere Linux-systemen correct volgens de gewenste volgorde kunnen worden verwerkt.
+
+Dezelfde drie VM-rollen, scripts en netwerkadressen worden ook in de Vagrantconfiguratie opgenomen. Hierdoor worden de RustProv- en Vagrantopstelling inhoudelijk gelijk gehouden.
 
 \newpage
 \subsubsection{Linux-script 1: database en Loki}
 
-Dit script installeert de databaseomgeving en Loki, zodat loggegevens centraal kunnen worden opgeslagen en later geanalyseerd. Het vormt de basislaag van de monitoringopstelling.
+Dit script installeert de databaseomgeving en Loki, zodat loggegevens centraal kunnen worden opgeslagen en later geanalyseerd. Het vormt de basislaag van de monitoringopstelling. De configuraties hiervan wordt weergegeven in Listing~\ref{lst:dbloki}
 
-\begin{lstlisting}[language=bash,caption={Linux-script 1: installatie van database en Loki.}]
-    #!/bin/bash
+\begin{lstlisting}[language=bash,caption={Linux-script 1: installatie van database en Loki.},label={lst:dbloki}]
+    #!/usr/bin/env bash
+    set -euo pipefail
     
-    # Install dependencies
-    sudo yum update -y
-    sudo yum install -y wget curl unzip tar
+    INTERFACE="eth1"
     
-    # Download and install Loki
-    cd /opt
-    sudo mkdir -p /opt/loki
-    cd /opt/loki
-    sudo wget https://github.com/grafana/loki/releases/download/v2.9.2/loki-linux-amd64.zip
-    sudo unzip loki-linux-amd64.zip
-    sudo chmod +x loki-linux-amd64
-    sudo mv loki-linux-amd64 /usr/local/bin/loki
+    if nmcli connection show "${INTERFACE}" &>/dev/null; then
+    nmcli connection modify "${INTERFACE}" \
+    ipv4.addresses "192.168.0.10/24" \
+    ipv4.gateway "192.168.0.1" \
+    ipv4.dns "8.8.8.8,1.1.1.1" \
+    ipv4.method "manual"
+    else
+    nmcli connection add type ethernet con-name "${INTERFACE}" ifname "${INTERFACE}" \
+    ipv4.addresses "192.168.0.10/24" \
+    ipv4.gateway "192.168.0.1" \
+    ipv4.dns "8.8.8.8,1.1.1.1" \
+    ipv4.method "manual"
+    fi
     
-    # Create Loki config
-    sudo mkdir -p /etc/loki
-    cat <<EOF | sudo tee /etc/loki/loki-config.yaml > /dev/null
+    nmcli connection up "${INTERFACE}"
+    sleep 5
+    
+    dnf update -y
+    dnf install -y curl unzip mariadb-server policycoreutils-python-utils firewalld
+    
+    systemctl enable --now firewalld
+    
+    firewall-cmd --permanent --add-service=mysql
+    firewall-cmd --permanent --add-port=3100/tcp
+    firewall-cmd --reload
+    
+    if ! grep -q "^bind-address" /etc/my.cnf.d/mariadb-server.cnf 2>/dev/null; then
+    sed -i '/\[mysqld\]/a bind-address = 0.0.0.0' /etc/my.cnf.d/mariadb-server.cnf
+    else
+    sed -i 's/^bind-address\s*=.*/bind-address = 0.0.0.0/' /etc/my.cnf.d/mariadb-server.cnf
+    fi
+    
+    systemctl enable --now mariadb
+    
+    DB_NAME="wordpress"
+    DB_USER="wp_user"
+    DB_PASS="password2026!"
+    WP_SERVER_IP="192.168.0.20"
+    
+    mysql -u root <<EOF
+    CREATE DATABASE IF NOT EXISTS ${DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE USER IF NOT EXISTS '${DB_USER}'@'${WP_SERVER_IP}' IDENTIFIED BY '${DB_PASS}';
+    GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'${WP_SERVER_IP}';
+    FLUSH PRIVILEGES;
+    EOF
+    
+    LOKI_VERSION="2.9.2"
+    mkdir -p /etc/loki /var/loki
+    
+    curl -sSL -O "https://github.com/grafana/loki/releases/download/v${LOKI_VERSION}/loki-linux-amd64.zip"
+    unzip -o loki-linux-amd64.zip
+    mv loki-linux-amd64 /usr/local/bin/loki
+    chmod +x /usr/local/bin/loki
+    rm -f loki-linux-amd64.zip
+    
+    cat <<'EOF' > /etc/loki/loki-config.yml
     auth_enabled: false
     
     server:
     http_listen_port: 3100
+    grpc_listen_port: 9096
     
     common:
-    path_prefix: /loki
+    path_prefix: /var/loki
     storage:
     filesystem:
-    chunks_directory: /loki/chunks
-    rules_directory: /loki/rules
+    chunks_directory: /var/loki/chunks
+    rules_directory: /var/loki/rules
     replication_factor: 1
     ring:
     kvstore:
@@ -111,148 +206,387 @@ Dit script installeert de databaseomgeving en Loki, zodat loggegevens centraal k
     
     schema_config:
     configs:
-    - from: 2024-01-01
-    store: tsdb
+    - from: 2020-05-15
+    store: boltdb-shipper
     object_store: filesystem
-    schema: v13
+    schema: v11
     index:
-    prefix: loki_index_
+    prefix: index_
     period: 24h
     
-    storage_config:
-    tsdb_shipper:
-    active_index_directory: /loki/index
-    cache_location: /loki/index_cache
+    ruler:
+    alertmanager_url: http://localhost:9093
     EOF
     
-    # Create directories
-    sudo mkdir -p /loki/chunks /loki/rules /loki/index /loki/index_cache
+    chcon -t bin_t /usr/local/bin/loki 2>/dev/null || true
     
-    # Create systemd service
-    cat <<EOF | sudo tee /etc/systemd/system/loki.service > /dev/null
+    cat <<'EOF' > /etc/systemd/system/loki.service
     [Unit]
-    Description=Loki
+    Description=Loki service
     After=network.target
     
     [Service]
-    ExecStart=/usr/local/bin/loki -config.file=/etc/loki/loki-config.yaml
-    Restart=always
+    Type=simple
     User=root
+    ExecStart=/usr/local/bin/loki -config.file=/etc/loki/loki-config.yml
+    Restart=on-failure
     
     [Install]
     WantedBy=multi-user.target
     EOF
     
-    sudo systemctl daemon-reload
-    sudo systemctl enable --now loki
+    systemctl daemon-reload
+    systemctl enable --now loki
 \end{lstlisting}
 
 \newpage
 \subsubsection{Linux-script 2: WordPress en Promtail}
 
-Dit script installeert WordPress en Promtail. WordPress levert de webtoepassing, terwijl Promtail de logs van het systeem doorstuurt naar Loki voor centrale logverzameling.
+Dit script installeert WordPress en Promtail. WordPress levert de webtoepassing, terwijl Promtail de logs van het systeem doorstuurt naar Loki voor centrale logverzameling.De configuraties hiervan wordt weergegeven in Listing~\ref{lst:wppromtail}
 
-\begin{lstlisting}[language=bash,caption={Linux-script 2: installatie van WordPress en Promtail.}]
-    #!/bin/bash
+\begin{lstlisting}[language=bash,caption={Linux-script 2: installatie van WordPress en Promtail.},label={lst:wppromtail}]
+    #!/usr/bin/env bash
+    set -euo pipefail
     
-    # Update system
-    sudo yum update -y
-    sudo yum install -y httpd wget php php-mysqlnd php-fpm unzip curl
+    INTERFACE="eth1"
     
-    # Install WordPress
-    cd /tmp
-    wget https://wordpress.org/latest.tar.gz
-    tar -xzf latest.tar.gz
-    sudo cp -r wordpress/* /var/www/html/
+    nmcli con modify "$INTERFACE" ipv4.addresses 192.168.0.20/24 ipv4.gateway 192.168.0.1 ipv4.dns "8.8.8.8 1.1.1.1" ipv4.method manual
+    nmcli con up "$INTERFACE"
+    sleep 5 
     
-    # Set permissions
-    sudo chown -R apache:apache /var/www/html
-    sudo chmod -R 755 /var/www/html
     
-    # Configure Apache
-    sudo systemctl enable httpd
-    sudo systemctl start httpd
+    dnf install -y epel-release
+    dnf install -y nginx php-fpm php-mysqlnd php-cli php-curl php-gd php-mbstring php-xml php-intl php-zip curl unzip policycoreutils-python-utils firewalld tar
     
-    # Install Promtail
-    cd /opt
-    sudo mkdir -p /opt/promtail
-    cd /opt/promtail
-    sudo wget https://github.com/grafana/loki/releases/download/v2.9.2/promtail-linux-amd64.zip
-    sudo unzip promtail-linux-amd64.zip
-    sudo chmod +x promtail-linux-amd64
-    sudo mv promtail-linux-amd64 /usr/local/bin/promtail
+    systemctl enable --now firewalld
+    firewall-cmd --permanent --add-service=http
+    firewall-cmd --reload
     
-    # Create Promtail config
-    sudo mkdir -p /etc/promtail
-    cat <<EOF | sudo tee /etc/promtail/promtail-config.yaml > /dev/null
+    mkdir -p /var/www
+    curl -sSL https://wordpress.org/latest.tar.gz | tar -xz -C /var/www/
+    
+    chown -R nginx:nginx /var/www/wordpress
+    
+    DB_HOST="192.168.0.10"
+    DB_NAME="wordpress"
+    DB_USER="wp_user"
+    DB_PASS="password2026!"
+    
+    cat <<EOF > /var/www/wordpress/wp-config.php
+    <?php
+    define( 'DB_NAME', '${DB_NAME}' );
+    define( 'DB_USER', '${DB_USER}' );
+    define( 'DB_PASSWORD', '${DB_PASS}' );
+    define( 'DB_HOST', '${DB_HOST}' );
+    define( 'DB_CHARSET', 'utf8mb4' );
+    define( 'DB_COLLATE', '' );
+    
+    $(curl -sSL https://api.wordpress.org/secret-key/1.1/salt/)
+    
+    \$table_prefix = 'wp_';
+    define( 'WP_DEBUG', false );
+    
+    if ( ! defined( 'ABSPATH' ) ) {
+        define( 'ABSPATH', __DIR__ . '/' );
+    }
+    require_once ABSPATH . 'wp-settings.php';
+    EOF
+    
+    chown nginx:nginx /var/www/wordpress/wp-config.php
+    
+    chcon -Rt httpd_sys_rw_content_t /var/www/wordpress
+    setsebool -P httpd_can_network_connect_db 1
+    setsebool -P httpd_can_network_connect 1
+    
+    sed -i 's/user = apache/user = nginx/g' /etc/php-fpm.d/www.conf
+    sed -i 's/group = apache/group = nginx/g' /etc/php-fpm.d/www.conf
+    systemctl enable --now php-fpm
+    
+    mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+    cat <<'EOF' > /etc/nginx/nginx.conf
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log;
+    pid /run/nginx.pid;
+    include /usr/share/nginx/modules/*.conf;
+    events { worker_connections 1024; }
+    http {
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+        '$status $body_bytes_sent "$http_referer" '
+        '"$http_user_agent" "$http_x_forwarded_for"';
+        access_log  /var/log/nginx/access.log  main;
+        sendfile            on;
+        tcp_nopush          on;
+        tcp_nodelay         on;
+        keepalive_timeout   65;
+        types_hash_max_size 4096;
+        include             /etc/nginx/mime.types;
+        default_type        application/octet-stream;
+        include /etc/nginx/conf.d/*.conf;
+    }
+    EOF
+    
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name _;
+        root /var/www/wordpress;
+        index index.php index.html index.htm;
+        
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        }
+        
+        location ~ \.php$ {
+            try_files $uri =404;
+            # AlmaLinux uses this socket path for PHP-FPM
+            fastcgi_pass unix:/run/php-fpm/www.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+    }
+    EOF
+    
+    nginx -t
+    systemctl enable --now nginx
+    
+    PROMTAIL_VERSION="2.9.2"
+    mkdir -p /etc/promtail /var/promtail
+    
+    curl -sSL -O "https://github.com/grafana/loki/releases/download/v${PROMTAIL_VERSION}/promtail-linux-amd64.zip"
+    unzip -o promtail-linux-amd64.zip
+    mv promtail-linux-amd64 /usr/local/bin/promtail
+    chmod +x /usr/local/bin/promtail
+    rm -f promtail-linux-amd64.zip
+    
+    LOKI_IP="192.168.0.10"
+    
+    cat <<EOF > /etc/promtail/promtail-config.yml
     server:
     http_listen_port: 9080
+    grpc_listen_port: 0
     
     positions:
-    filename: /tmp/positions.yaml
+    filename: /var/promtail/positions.yaml
     
     clients:
-    - url: http://127.0.0.1:3100/loki/api/v1/push
+    - url: http://${LOKI_IP}:3100/loki/api/v1/push
     
     scrape_configs:
-    - job_name: system
+    - job_name: nginx
     static_configs:
     - targets:
     - localhost
     labels:
-    job: varlogs
-    __path__: /var/log/*log
+    job: nginx_access
+    host: wordpress-server
+    __path__: /var/log/nginx/access.log
+    - targets:
+    - localhost
+    labels:
+    job: nginx_error
+    host: wordpress-server
+    __path__: /var/log/nginx/error.log
     EOF
     
-    # Create systemd service
-    cat <<EOF | sudo tee /etc/systemd/system/promtail.service > /dev/null
+    cat <<'EOF' > /etc/systemd/system/promtail.service
     [Unit]
-    Description=Promtail
+    Description=Promtail service
     After=network.target
     
     [Service]
-    ExecStart=/usr/local/bin/promtail -config.file=/etc/promtail/promtail-config.yaml
-    Restart=always
+    Type=simple
     User=root
+    ExecStart=/usr/local/bin/promtail -config.file=/etc/promtail/promtail-config.yml
+    Restart=on-failure
     
     [Install]
     WantedBy=multi-user.target
     EOF
     
-    sudo systemctl daemon-reload
-    sudo systemctl enable --now promtail
+    systemctl daemon-reload
+    systemctl enable --now promtail
 \end{lstlisting}
 
 \newpage
 \subsubsection{Linux-script 3: monitoring met Grafana}
 
-Dit script installeert Grafana en maakt de monitoringomgeving volledig. Grafana gebruikt de data uit Loki om dashboards en logoverzichten weer te geven.
+Dit script installeert Grafana en maakt de monitoringomgeving volledig. Grafana gebruikt de data uit Loki om dashboards en logoverzichten weer te geven. De configuraties hiervan wordt weergegeven in Listing~\ref{lst:mgrafana}
 
-\begin{lstlisting}[language=bash,caption={Linux-script 3: installatie van Grafana en monitoring.}]
-    #!/bin/bash
+\begin{lstlisting}[language=bash,caption={Linux-script 3: installatie van Grafana en monitoring.},label={lst:mgrafana}]
+    #!/usr/bin/env bash
+    set -euo pipefail
     
-    # Install Grafana repository
-    sudo yum install -y https://dl.grafana.com/enterprise/release/grafana-enterprise-11.1.0-1.x86_64.rpm
+    INTERFACE="eth1"
     
-    # Enable and start Grafana
-    sudo systemctl daemon-reload
-    sudo systemctl enable --now grafana-server
+    if nmcli con show "${INTERFACE}" >/dev/null 2>&1; then
+    nmcli con mod "${INTERFACE}" ipv4.addresses 192.168.0.30/24 ipv4.gateway 192.168.0.1 ipv4.dns "8.8.8.8 1.1.1.1" ipv4.method manual
+    else
+    nmcli con add type ethernet con-name "${INTERFACE}" ifname "${INTERFACE}" ipv4.addresses 192.168.0.30/24 ipv4.gateway 192.168.0.1 ipv4.dns "8.8.8.8 1.1.1.1" ipv4.method manual
+    fi
     
-    # Add Loki datasource via provisioning
-    sudo mkdir -p /etc/grafana/provisioning/datasources
-    cat <<EOF | sudo tee /etc/grafana/provisioning/datasources/loki.yaml > /dev/null
+    nmcli con up "${INTERFACE}"
+    sleep 5
+    
+    dnf install -y wget curl unzip firewalld
+    
+    systemctl enable --now firewalld
+    firewall-cmd --permanent --add-port=3000/tcp
+    firewall-cmd --reload
+    
+    # Create the RPM repository file for Grafana
+    cat <<EOF > /etc/yum.repos.d/grafana.repo
+    [grafana]
+    name=grafana
+    baseurl=https://rpm.grafana.com
+    repo_gpgcheck=1
+    enabled=1
+    gpgcheck=1
+    gpgkey=https://rpm.grafana.com/gpg.key
+    sslverify=1
+    sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+    EOF
+    
+    dnf install -y grafana
+    
+    LOKI_IP="192.168.0.10"
+    mkdir -p /etc/grafana/provisioning/datasources
+    
+    cat <<EOF > /etc/grafana/provisioning/datasources/loki.yaml
     apiVersion: 1
     
     datasources:
     - name: Loki
     type: loki
     access: proxy
-    url: http://127.0.0.1:3100
+    url: http://${LOKI_IP}:3100
     isDefault: true
+    editable: true
     EOF
     
-    sudo systemctl restart grafana-server
+    PROMTAIL_VERSION="2.9.2"
+    mkdir -p /etc/promtail /var/promtail
+    
+    curl -sSL -O "https://github.com/grafana/loki/releases/download/v${PROMTAIL_VERSION}/promtail-linux-amd64.zip"
+    unzip -o promtail-linux-amd64.zip
+    mv promtail-linux-amd64 /usr/local/bin/promtail
+    chmod +x /usr/local/bin/promtail
+    rm -f promtail-linux-amd64.zip
+    
+    cat <<EOF > /etc/promtail/promtail-config.yml
+    server:
+    http_listen_port: 9080
+    grpc_listen_port: 0
+    
+    positions:
+    filename: /var/promtail/positions.yaml
+    
+    clients:
+    - url: http://${LOKI_IP}:3100/loki/api/v1/push
+    
+    scrape_configs:
+    - job_name: varlogs
+    static_configs:
+    - targets:
+    - localhost
+    labels:
+    job: varlogs
+    host: monitoring-server
+    __path__: /var/log/*.log
+    EOF
+    
+    cat <<'EOF' > /etc/systemd/system/promtail.service
+    [Unit]
+    Description=Promtail service
+    After=network.target
+    
+    [Service]
+    Type=simple
+    User=root
+    ExecStart=/usr/local/bin/promtail -config.file=/etc/promtail/promtail-config.yml
+    Restart=on-failure
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+    
+    systemctl daemon-reload
+    systemctl enable --now grafana-server
+    systemctl enable --now promtail
 \end{lstlisting}
+\newpage
+
+
+Voor de Linuxexperimenten werd dezelfde VM-opstelling beschreven in zowel een
+TOML-configuratiebestand voor RustProv als een \texttt{Vagrantfile} voor Vagrant.
+Op die manier wordt ervoor gezorgd dat beide provisioners dezelfde virtuele
+machines, hardware-instellingen, netwerkadapter en provisioningscripts gebruiken.
+De configuraties worden weergegeven in Listing~\ref{lst:rustprov-linux-config} en
+Listing~\ref{lst:vagrant-linux-config}.
+
+
+\begin{lstlisting}[language=bash,caption={RustProv-configuratie voor meerdere Linux-VM's.},label={lst:rustprov-linux-config}]
+    [dbloki]
+    image = "almalinux9"
+    cores = 4
+    memory = 4096
+    script = ["01-db-loki.sh"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+    
+    [wppromtail]
+    image = "almalinux9"
+    cores = 4
+    memory = 4096
+    script = ["02-wordpress-promtail.sh"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+    
+    [monitorgrafana]
+    image = "almalinux9"
+    cores = 4
+    memory = 4096
+    script = ["03-monitoring-grafana.sh"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+\end{lstlisting}
+\newpage
+
+
+
+
+\begin{lstlisting}[language=ruby,caption={Vagrant-configuratie voor meerdere Linux-VM's.},label={lst:vagrant-linux-config}]
+    Vagrant.configure("2") do |config|
+    config.vm.box = "almalinux/9"
+    config.vm.box_version = "9.7.20260518"
+    config.vm.define "dbloki" do |dbloki|
+    dbloki.vm.hostname = "dbloki"  
+    dbloki.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller", auto_config: false   
+    dbloki.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+    end
+    dbloki.vm.provision "shell", path: "scripts/01-db-loki.sh"
+    end
+    config.vm.define "wppromtail" do |wp|
+    wp.vm.hostname = "wppromtail"
+    wp.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller", auto_config: false
+    wp.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+    end
+    wp.vm.provision "shell", path: "scripts/02-wordpress-promtail.sh"
+    end
+    config.vm.define "monitorgrafana" do |grafana|
+    grafana.vm.hostname = "monitorgrafana"   
+    grafana.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller", auto_config: false  
+    grafana.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+    end
+    grafana.vm.provision "shell", path: "scripts/03-monitoring-grafana.sh"
+    end
+    end
+\end{lstlisting}
+
 
 
 

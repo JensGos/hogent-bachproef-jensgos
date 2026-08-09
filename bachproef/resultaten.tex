@@ -1,2 +1,225 @@
 \chapter{\IfLanguageName{dutch}{Resultaten}{Results}}%
 \label{ch:resultaten}
+
+Dit hoofdstuk bespreekt de resultaten van de experimenten uit
+Hoofdstuk~\ref{ch:experimentopzet}. Eerst wordt toegelicht hoe de
+uitvoeringstijden werden gemeten. Daarbij wordt een onderscheid gemaakt tussen
+scenario's met één virtuele machine en scenario's met meerdere virtuele machines.
+Vervolgens worden de metingen voor Linux en Windows weergegeven. Ten slotte
+worden de resultaten van RustProv en Vagrant met elkaar vergeleken.
+
+\section{Meetmethode}
+\label{sec:meetmethode}
+
+Om de uitvoeringstijden op een consistente manier te registreren, werden twee
+PowerShell-scripts gebruikt. Het eerste script is bedoeld voor scenario's met
+één virtuele machine. Het tweede script wordt gebruikt voor scenario's met
+meerdere virtuele machines. Beide scripts meten de duur van een opgegeven
+opdracht en schrijven het resultaat weg naar een CSV-bestand.
+
+Bij één virtuele machine worden de starttijd en de provisioningtijd afzonderlijk
+gemeten. De starttijd is de tijd die nodig is om de VM op te starten. De
+provisioningtijd is de tijd die nodig is om het provisioningsscript uit te
+voeren.
+
+Bij meerdere virtuele machines wordt alleen de totale uitvoeringstijd van de
+volledige opstelling gemeten. Deze tijd omvat zowel het opstarten als het
+provisionen van alle VM's. De VM's worden daarbij na elkaar verwerkt.
+
+Elke meting wordt drie keer uitgevoerd onder dezelfde omstandigheden. Hierdoor
+wordt vermeden dat één uitzonderlijk snelle of trage uitvoering het resultaat
+bepaalt. Op basis van de drie afzonderlijke metingen wordt per scenario het
+gemiddelde berekend. Dit gemiddelde wordt gebruikt om RustProv en Vagrant met
+elkaar te vergelijken.
+
+Voor één virtuele machine wordt de totale uitvoeringstijd berekend als de som van
+de gemiddelde starttijd en de gemiddelde provisioningtijd:
+
+\[
+\overline{T}_{\mathrm{totaal}} =
+\overline{T}_{\mathrm{start}} +
+\overline{T}_{\mathrm{provisioning}}
+\]
+
+Voor meerdere virtuele machines wordt de totale uitvoeringstijd rechtstreeks
+gemeten vanaf het starten van de volledige opstelling tot het moment waarop alle
+VM's succesvol zijn geprovisioned.
+
+Dezelfde meetmethode wordt toegepast op RustProv en Vagrant. De gebruikte
+virtuele machines, configuraties, provisioningscripts en
+hardware-instellingen blijven daarbij gelijk.
+
+\subsection{PowerShell-meetscripts}
+
+Voor de meting van één virtuele machine wordt een afzonderlijk PowerShell-script
+gebruikt. Dit script meet de starttijd en de provisioningtijd afzonderlijk. Het
+volledige script wordt weergegeven in
+Listing~\ref{lst:meet-script-one-vm}.
+
+\begin{lstlisting}[language=bash,
+    caption={PowerShell-script voor het meten van één virtuele machine.},
+    label={lst:meet-script-one-vm}]
+    % Het PowerShell-meetscript voor één VM wordt hier ingevoegd.
+\end{lstlisting}
+
+Voor scenario's met meerdere virtuele machines wordt een tweede PowerShell-script
+gebruikt. Dit script meet enkel de totale uitvoeringstijd van de volledige
+opstelling. Het volledige script wordt weergegeven in
+Listing~\ref{lst:meet-script-multiple-vms}.
+
+\begin{lstlisting}[language=bash,
+    caption={PowerShell-script voor het meten van meerdere virtuele machines.},
+    label={lst:meet-script-multiple-vms}]
+    % Het PowerShell-meetscript voor meerdere VM's wordt hier ingevoegd.
+\end{lstlisting}
+
+Beide scripts registreren per meting minstens de gebruikte tool, het scenario en
+de uitvoeringstijd. De tijd wordt uitgedrukt in seconden. De resultaten worden
+opgeslagen in een CSV-bestand, zodat de afzonderlijke metingen kunnen worden
+verwerkt en het gemiddelde per scenario kan worden berekend.
+
+\section{Meting van één Linux-VM}
+
+Voor het eerste scenario werd één AlmaLinux-VM gebruikt. De starttijd en de
+provisioningtijd werden afzonderlijk gemeten voor zowel RustProv als Vagrant. De
+VM werd voor elke nieuwe meting in dezelfde beginsituatie geplaatst.
+
+Bij RustProv werd de starttijd gemeten met het commando \texttt{start}. Nadat de
+VM was opgestart, werd de provisioningtijd gemeten met het commando
+\texttt{provision}. Bij Vagrant werd dezelfde procedure gevolgd met
+respectievelijk \texttt{vagrant up} en \texttt{vagrant provision}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Meting van één Linux-VM met RustProv en Vagrant.}
+    \label{tab:meting-een-linux}
+    \begin{tabular}{llrrrr}
+        \toprule
+        \textbf{Tool} &
+        \textbf{Onderdeel} &
+        \textbf{Run 1 (s)} &
+        \textbf{Run 2 (s)} &
+        \textbf{Run 3 (s)} &
+        \textbf{Gemiddelde (s)} \\
+        \midrule
+        RustProv & Start & -- & -- & -- & -- \\
+        RustProv & Provisioning & -- & -- & -- & -- \\
+        Vagrant  & Start & -- & -- & -- & -- \\
+        Vagrant  & Provisioning & -- & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Tabel~\ref{tab:meting-een-linux} toont de afzonderlijke metingen en de
+gemiddelde uitvoeringstijden voor RustProv en Vagrant bij het scenario met één
+Linux-VM. De totale uitvoeringstijd wordt berekend door de gemiddelde starttijd
+en de gemiddelde provisioningtijd bij elkaar op te tellen.
+
+\section{Meting van meerdere Linux-VM's}
+
+Voor het tweede scenario werden drie AlmaLinux-VM's gebruikt. De VM's werden één
+voor één opgestart en vervolgens één voor één geprovisioned. In tegenstelling tot
+het scenario met één Linux-VM wordt hier alleen de totale uitvoeringstijd van de
+volledige Linuxopstelling gemeten.
+
+De meting start wanneer het commando voor de volledige opstelling wordt
+uitgevoerd en eindigt wanneer alle drie de VM's zijn opgestart en de bijhorende
+provisioningsscripts succesvol na elkaar zijn uitgevoerd. De VM's werden tijdens
+elke run in dezelfde volgorde verwerkt, zodat de uitvoeringsvolgorde tussen de
+verschillende metingen gelijk bleef.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Totale uitvoeringstijd van meerdere Linux-VM's met RustProv en Vagrant.}
+    \label{tab:meting-meerdere-linux}
+    \begin{tabular}{lrrrr}
+        \toprule
+        \textbf{Tool} &
+        \textbf{Run 1 (s)} &
+        \textbf{Run 2 (s)} &
+        \textbf{Run 3 (s)} &
+        \textbf{Gemiddelde (s)} \\
+        \midrule
+        RustProv & -- & -- & -- & -- \\
+        Vagrant  & -- & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Tabel~\ref{tab:meting-meerdere-linux} toont de drie afzonderlijke metingen en
+het gemiddelde voor de volledige Linuxopstelling. De gemeten tijd omvat zowel
+het na elkaar opstarten van de drie VM's als het na elkaar uitvoeren van de
+bijhorende provisioningsscripts.
+
+\section{Meting van één Windows-VM}
+
+Voor het derde scenario werd één Windows-VM gebruikt. De starttijd en de
+provisioningtijd werden afzonderlijk gemeten voor RustProv en Vagrant. Voor elke
+run werd dezelfde Windows-VM gebruikt en werd dezelfde beginsituatie voorzien.
+
+De starttijd omvat het opstarten van de Windows-VM. De provisioningtijd omvat het
+uitvoeren van het Windows-provisioningscript en het afronden van de bijhorende
+configuratiestappen.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Meting van één Windows-VM met RustProv en Vagrant.}
+    \label{tab:meting-een-windows}
+    \begin{tabular}{llrrrr}
+        \toprule
+        \textbf{Tool} &
+        \textbf{Onderdeel} &
+        \textbf{Run 1 (s)} &
+        \textbf{Run 2 (s)} &
+        \textbf{Run 3 (s)} &
+        \textbf{Gemiddelde (s)} \\
+        \midrule
+        RustProv & Start & -- & -- & -- & -- \\
+        RustProv & Provisioning & -- & -- & -- & -- \\
+        Vagrant  & Start & -- & -- & -- & -- \\
+        Vagrant  & Provisioning & -- & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Tabel~\ref{tab:meting-een-windows} toont de afzonderlijke metingen en de
+gemiddelde uitvoeringstijden voor RustProv en Vagrant bij het scenario met één
+Windows-VM. De gemiddelde waarden worden gebruikt om de uitvoeringstijd van
+beide provisioners met elkaar te vergelijken.
+
+\section{Meting van meerdere Windows-VM's}
+
+Voor het vierde scenario werden drie Windows-VM's gebruikt: twee servers en één
+client. De VM's werden tijdens elke run in dezelfde volgorde opgestart en
+geprovisioned. Net zoals bij het meerledige Linuxscenario wordt hier alleen de
+totale uitvoeringstijd van de volledige Windowsopstelling gemeten.
+
+De meting start wanneer het commando voor de volledige Windowsopstelling wordt
+uitgevoerd en eindigt wanneer alle drie de VM's zijn opgestart en de drie
+Windowsprovisioningsscripts na elkaar succesvol zijn uitgevoerd.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Totale uitvoeringstijd van meerdere Windows-VM's met RustProv en Vagrant.}
+    \label{tab:meting-meerdere-windows}
+    \begin{tabular}{lrrrr}
+        \toprule
+        \textbf{Tool} &
+        \textbf{Run 1 (s)} &
+        \textbf{Run 2 (s)} &
+        \textbf{Run 3 (s)} &
+        \textbf{Gemiddelde (s)} \\
+        \midrule
+        RustProv & -- & -- & -- & -- \\
+        Vagrant  & -- & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Tabel~\ref{tab:meting-meerdere-windows} toont de drie afzonderlijke metingen en
+het gemiddelde voor de volledige Windowsopstelling. De gemeten tijd omvat zowel
+het na elkaar opstarten van de drie Windows-VM's als het na elkaar uitvoeren van
+de drie Windowsprovisioningsscripts.
+
+\section{Vergelijking tussen RustProv en Vagrant}
+\label{sec:vergelijking-rustprov-vagrant}
