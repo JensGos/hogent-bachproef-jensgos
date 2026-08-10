@@ -1,6 +1,5 @@
 \chapter{\IfLanguageName{dutch}{Implementatie}{Implementation}}%
 
-
 \label{ch:implementatie}
 
 Dit hoofdstuk beschrijft hoe RustProv stapsgewijs werd opgebouwd tijdens de verschillende sprints van het project. Waar het hoofdstuk Methodologie vooral het plan van aanpak op hoofdlijnen toelicht, ligt de focus hier op de concrete technische uitwerking. Per sprint wordt aangegeven welke functionaliteiten werden gerealiseerd, welke ontwerpkeuzes daarbij belangrijk waren en wat de tool op dat moment reeds kon uitvoeren.
@@ -13,9 +12,23 @@ Tijdens deze sprint werd gebruikgemaakt van \texttt{VBoxManage}-commando's om ni
 
 Aan het einde van deze sprint kon RustProv reeds een VM opstarten op basis van een voorbereide box en de toestand van die VM opvragen. De codebasis bestond aanvankelijk uit één groter bestand, maar werd tijdens deze fase al gedeeltelijk herschikt naar een meer modulaire structuur om latere uitbreidingen mogelijk te maken.
 
-\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na sprint 1.}]
-
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na sprint 1.},label={lst:sprint-1}]
+PS C:\Users\JensG\Desktop\gitbphistory\Sprint1_startvm\target\release> .\app.exe start
+> VBoxManage createvm --name windows-vm --ostype Windows10_64 --register
+Virtual machine 'windows-vm' is created and registered.
+UUID: 5e241e88-056f-4145-bd73-52ac2fd87cab
+Settings file: 'C:\Users\JensG\VirtualBox VMs\windows-vm\windows-vm.vbox'
+> VBoxManage modifyvm windows-vm --memory 2048 --cpus 2 --vram 128 --nic1 nat --audio none
+Warning: --audio is deprecated and will be removed soon. Use --audio-driver instead!
+> VBoxManage storagectl windows-vm --name SATA Controller --add sata --controller IntelAHCI
+> VBoxManage internalcommands sethduuid C:\Users\JensG\.test_dest\windows-vm\vdi.vdi
+UUID changed to: 808aab78-851a-4792-aa38-1069a30859e1
+> VBoxManage storageattach windows-vm --storagectl SATA Controller --port 0 --device 0 --type hdd --medium C:\Users\JensG\.test_dest\windows-vm\vdi.vdi
+> VBoxManage sharedfolder add windows-vm --name shared --hostpath ./scripts --automount
+> VBoxManage controlvm windows-vm natpf1 guestssh,tcp,,2222,,22
 \end{lstlisting}
+
+De console-uitvoer in Listing~\ref{lst:sprint-1} toont een voorbeeld van het aanmaken en configureren van een Windows-VM met RustProv. De console-uitvoer toont hoe RustProv een Windows-VM aanmaakt en configureert.
 
 \section{Sprint 2: provisioning via SSH}
 
@@ -27,13 +40,26 @@ Een bijkomend aandachtspunt in deze sprint was het beheer van portforwardingrege
 
 Na deze sprint kon RustProv niet alleen een VM opstarten, maar ook automatisch verbinding maken via SSH en een provisioningscript uitvoeren op zowel Linux- als Windowsmachines. Daarmee werd de kern van de tool functioneel.
 
-\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij Linux-provisioning na sprint 2.}]
-
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij Linux-provisioning na sprint 2.},label={lst:sprint-2-linux}]
+PS C:\Users\JensG\Desktop\gitbphistory\Sprint2_Linux\target\release> .\app.exe provision
+IP address not set for VM 'ubuntu-vm'
+VM running on IP: NoneAttempting to provision
+Hello, World!
+Hello, World from a file in linux!
+Provisioning complete! Check the output above for details.
 \end{lstlisting}
 
-\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij Windows-provisioning na sprint 2.}]
+Listing~\ref{lst:sprint-2-linux} toont het uitvoeren van een provisioningscript op een Linux-machine.
 
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij Windows-provisioning na sprint 2.},label={lst:sprint-2-windows}]
+PS C:\Users\JensG\Desktop\gitbphistory\Sprint2_windows\target\release> .\app.exe provision
+Attempting to provision
+Hello, World!
+Hello, World from a file in windows!
+Provisioning complete! Check the output above for details.
 \end{lstlisting}
+
+Listing~\ref{lst:sprint-2-windows} toont het uitvoeren van een provisioningscript op een Windows-machine.
 
 \section{Sprint 3: externe configuratie}
 
@@ -43,8 +69,31 @@ Door de introductie van TOML-configuratie konden VM-namen, besturingssysteemtype
 
 Na deze sprint kon RustProv op basis van een declaratief configuratiebestand een VM-opstelling interpreteren en de nodige voorbereidingen treffen voor verdere uitvoering. Daarmee werd de tool niet alleen functioneel, maar ook beter bruikbaar voor herhaalde experimenten en verschillende onderwijsopstellingen.
 
-\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na het inlezen van TOML-configuratie.}]
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na het inlezen van TOML-configuratie.},label={lst:sprint-3}]
+PS C:\Users\JensG\Desktop\gitbphistory\Sprint2_windows\target\release> .\app.exe start
+Starting VM: windowstoml
+Image: windows10, Cores: 4, Memory: 4096MB, Scripts: [""]
+VM windowstoml does not exist, creating and starting it...
+> VBoxManage createvm --name windowstoml --ostype Windows10_64 --register
+Virtual machine 'windowstoml' is created and registered.
+UUID: 67980b2c-f094-456e-9c4c-7e8bb5dd5749
+Settings file: 'C:\Users\JensG\VirtualBox VMs\windowstoml\windowstoml.vbox'
+> VBoxManage modifyvm windowstoml --memory 4096 --cpus 4 --vram 128 --nic1 nat --graphicscontroller vmsvga
+> VBoxManage storagectl windowstoml --name SATA Controller --add sata --controller IntelAHCI
+> VBoxManage internalcommands sethduuid C:\Users\JensG\.test_dest\windowstoml\vdi.vdi
+UUID changed to: 106a322d-0d02-4980-866a-50da0ad10a44
+> VBoxManage storageattach windowstoml --storagectl SATA Controller --port 0 --device 0 --type hdd --medium C:\Users\JensG\.test_dest\windowstoml\vdi.vdi
+> VBoxManage sharedfolder add windowstoml --name shared --hostpath ./scripts --automount
+> VBoxManage modifyvm windowstoml --nic2 bridged --bridgeadapter2 Realtek Gaming 2.5GbE Family Controller
+> VBoxManage startvm windowstoml --type headless
+Waiting for VM "windowstoml" to power on...
+VM "windowstoml" has been successfully started.
+All VMs started successfully!
 \end{lstlisting}
+
+Listing~\ref{lst:sprint-3} toont de console-uitvoer na het inlezen van de
+TOML-configuratie. De configuratie bevat informatie over het besturingssysteem,
+het aantal CPU-cores, het toegewezen geheugen en de gekoppelde scripts.
 
 \section{Sprint 4: uitbreidingen en gebruiksgemak}
 
@@ -54,9 +103,30 @@ Daarnaast werd de code verder opgesplitst zodat bepaalde acties zowel voor één
 
 Op het einde van deze sprint kon RustProv niet alleen configuraties inlezen en provisionen, maar ook scenario's met meerdere VM's beter beheren, snapshots aanmaken en meer bruikbare feedback geven aan de gebruiker via de CLI.
 
-\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer voor snapshots en statuscontrole na sprint 4.}]
-
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer voor restoratie van een snapshots na sprint 4.},label={lst:sprint-4-restore}]
+PS C:\Users\JensG\Desktop\gitbphistory\Sprint4_status_and_snapshots\target\release> .\app.exe restore                     
+Checking state of VM: ubuntupsnap
+Image: ubuntu, Cores: 4, Memory: 4096MB, Scripts: ["setup.sh"]
+> VBoxManage controlvm ubuntupsnap poweroff
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+> VBoxManage snapshot ubuntupsnap restore snapshot1
+Restoring snapshot 'snapshot1' (05c0863f-197b-4e8c-8705-4881ff663cbb)
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
 \end{lstlisting}
+
+Listing~\ref{lst:sprint-4-restore} toont het herstellen van een snapshot van
+een Linux-VM. Eerst wordt de VM uitgeschakeld, waarna de geselecteerde snapshot
+wordt teruggezet.
+
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer voor statuscontrole na sprint 4.},label={lst:sprint-4-state}]
+PS C:\Users\JensG\Desktop\gitbphistory\Sprint4_status_and_snapshots\target\release> .\app.exe state
+Checking state of VM: ubuntupsnap
+Image: ubuntu, Cores: 4, Memory: 4096MB, Scripts: ["setup.sh"]
+VM 'ubuntupsnap' is currently running
+\end{lstlisting}
+
+Listing~\ref{lst:sprint-4-state} toont het opvragen van de huidige status van
+een virtuele machine.
 
 \section{Sprint 5: foutafhandeling en robuustheid}
 
@@ -68,10 +138,77 @@ Een belangrijk onderdeel van deze sprint was de verdere herwerking van Windows-p
 
 Na deze sprint beschikte RustProv over een bruikbare proof of concept implementatie die VM's kon aanmaken, opstarten, provisionen, beheren en in foutscenario's gecontroleerd kon reageren. Daarmee was de basis gelegd voor de daaropvolgende experimenten en benchmarkvergelijkingen. 
 
-\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na sprint 5 met meerdere VM's en prioriteit.}]
-
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer na sprint 5 met meerdere VM's en prioriteit.},label={lst:sprint-5-prioriteit}]
+PS C:\Users\JensG\Desktop\gitbphistory\Sprint5_priority_and_error\target\release> .\app.exe start --provision  --priority
+Starting VM: ubuntu2
+Image: ubuntu, Cores: 4, Memory: 4096MB, Scripts: ["setup.sh"]
+> VBoxManage createvm --name ubuntu2 --ostype Linux_64 --register
+Virtual machine 'ubuntu2' is created and registered.
+UUID: 578bc95d-8138-4d2d-9eb4-0b14bf5d78be
+Settings file: 'C:\Users\JensG\VirtualBox VMs\ubuntu2\ubuntu2.vbox'
+> VBoxManage modifyvm ubuntu2 --memory 4096 --cpus 4 --vram 128 --nic1 nat --graphicscontroller vmsvga
+> VBoxManage storagectl ubuntu2 --name SATA Controller --add sata --controller IntelAHCI
+> VBoxManage internalcommands sethduuid C:\Users\JensG\.test_dest\ubuntu2\vdi.vdi
+UUID changed to: a2e8ca39-185c-4615-aad7-72893c96b90d
+> VBoxManage storageattach ubuntu2 --storagectl SATA Controller --port 0 --device 0 --type hdd --medium C:\Users\JensG\.test_dest\ubuntu2\vdi.vdi
+> VBoxManage sharedfolder add ubuntu2 --name shared --hostpath ./scripts --automount
+> VBoxManage startvm ubuntu2 --type headless
+Waiting for VM "ubuntu2" to power on...
+VM "ubuntu2" has been successfully started.
+provisioning VM...
+Provisioning VM: ubuntu2
+Image: ubuntu, Cores: 4, Memory: 4096MB, Scripts: ["setup.sh"]
+Provisioning VM: ubuntu2 with script: setup.sh
+Attempting to provision
+> VBoxManage controlvm ubuntu2 natpf1 guestsshrust,tcp,,2222,,22
+Connection established!
+Hello, World!
+Hello, World from a file!
+> VBoxManage controlvm ubuntu2 natpf1 delete guestsshrust
+Provisioning complete! Check the output above for details.
+VM ubuntu2 started and provisioned successfully!
+Starting VM: ubuntu1
+Image: ubuntu, Cores: 4, Memory: 4096MB, Scripts: ["setup.sh"]
+> VBoxManage createvm --name ubuntu1 --ostype Linux_64 --register
+Virtual machine 'ubuntu1' is created and registered.
+UUID: 4848da28-99c1-4001-9664-2ea10bd43e06
+Settings file: 'C:\Users\JensG\VirtualBox VMs\ubuntu1\ubuntu1.vbox'
+> VBoxManage modifyvm ubuntu1 --memory 4096 --cpus 4 --vram 128 --nic1 nat --graphicscontroller vmsvga
+> VBoxManage storagectl ubuntu1 --name SATA Controller --add sata --controller IntelAHCI
+> VBoxManage internalcommands sethduuid C:\Users\JensG\.test_dest\ubuntu1\vdi.vdi
+UUID changed to: 692b9d2b-e94f-425e-8262-0961d8f47390
+> VBoxManage storageattach ubuntu1 --storagectl SATA Controller --port 0 --device 0 --type hdd --medium C:\Users\JensG\.test_dest\ubuntu1\vdi.vdi
+> VBoxManage sharedfolder add ubuntu1 --name shared --hostpath ./scripts --automount
+> VBoxManage startvm ubuntu1 --type headless
+Waiting for VM "ubuntu1" to power on...
+VM "ubuntu1" has been successfully started.
+provisioning VM...
+Provisioning VM: ubuntu1
+Image: ubuntu, Cores: 4, Memory: 4096MB, Scripts: ["setup.sh"]
+Provisioning VM: ubuntu1 with script: setup.sh
+Attempting to provision
+> VBoxManage controlvm ubuntu1 natpf1 guestsshrust,tcp,,2222,,22
+Connection established!
+Hello, World!
+Hello, World from a file!
+> VBoxManage controlvm ubuntu1 natpf1 delete guestsshrust
+Provisioning complete! Check the output above for details.
+VM ubuntu1 started and provisioned successfully!
 \end{lstlisting}
 
-\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij foutafhandeling.}]
+Listing~\ref{lst:sprint-5-prioriteit} toont het opstarten en provisionen van
+meerdere VM's op basis van hun prioriteit. VM~\texttt{ubuntu2} wordt eerst
+opgestart en geprovisioneerd, waarna VM~\texttt{ubuntu1} wordt verwerkt. Dit
+komt doordat VM~\texttt{ubuntu2} een hogere prioriteit heeft.
 
+\begin{lstlisting}[language=bash,caption={Voorbeeld van console-uitvoer bij foutafhandeling.},label={lst:sprint-5-error}]
+PS C:\Users\JensG\Desktop\gitbphistory\Sprint5_priority_and_error\target\release> .\app.exe start
+thread 'main' (27348) panicked at src\commands\tomlread.rs:33:10:
+The TOML formatting is invalid!: TomlError { message: "missing field `image`", raw: Some("[ubuntu1]\r\nimage = \"ubuntu\"\r\ncores = 4\r\nmemory = 4096\r\nscript = [\"setup.sh\"]\r\npriority = 2\r\nbridgeNetwork = \"Realtek Gaming 2.5GbE Family Controller\"\r\n\r\n[ubuntu2]\r\ncores = 4\r\nmemory = 4096\r\nscript = [\"setup.sh\"]\r\npriority = 1\r\nbridgeNetwork = \"Realtek Gaming 2.5GbE Family Controller\"\r\n"), keys: [], span: Some(0..0) }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 \end{lstlisting}
+
+Listing~\ref{lst:sprint-5-error} toont de foutafhandeling bij een onvolledige
+TOML-configuratie. In de configuratie ontbreekt het verplichte veld
+\texttt{image} voor VM~\texttt{ubuntu2}, waardoor RustProv een foutmelding
+geeft en de uitvoering stopt.
