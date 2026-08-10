@@ -54,11 +54,11 @@ Deze opbouw gaat van algemene begrippen naar de specifieke oplossing die in dit 
 
 \section{Provisioner en provisioning}
 
-Provisioning verwijst naar het voorbereiden en beschikbaar maken van IT-infrastructuur. Dit kan onder meer betrekking hebben op servers, virtuele machines, netwerken, opslag en toegangsrechten. Bij geautomatiseerde provisioning worden deze stappen uitgevoerd door een tool, configuratiebestand of script in plaats van door een gebruiker die elke stap handmatig uitvoert. Hierdoor kan een omgeving sneller en consistenter worden opgebouwd \autocite{RedHat2023}.
+Provisioning verwijst naar het voorbereiden en beschikbaar maken van IT-infrastructuur. Dit kan onder meer betrekking hebben op servers, virtuele machines, netwerken, opslag en toegangsrechten. Bij geautomatiseerde provisioning worden deze stappen uitgevoerd door een tool, configuratiebestand of script in plaats van door een gebruiker die elke stap handmatig uitvoert. Hierdoor kan een omgeving sneller en consistenter worden opgebouwd \autocite{RedHat2026}.
 
-Een provisioner is een toepassing die infrastructuur automatisch kan aanmaken en voorbereiden voor gebruik. In het geval van virtuele machines omvat dit bijvoorbeeld het aanmaken of herkennen van een VM, het instellen van hardware- en netwerkparameters, het starten van de machine en het uitvoeren van configuratiestappen op het gastbesturingssysteem \autocite{RedHat2023,HashiCorp2025}. Een provisioner beperkt zich dus niet tot het beheren van de levenscyclus van een VM, maar zorgt er ook voor dat de machine in een bruikbare toestand wordt achtergelaten.
+Een provisioner is een toepassing die infrastructuur automatisch kan aanmaken en voorbereiden voor gebruik. In het geval van virtuele machines omvat dit bijvoorbeeld het aanmaken of herkennen van een VM, het instellen van hardware- en netwerkparameters, het starten van de machine en het uitvoeren van configuratiestappen op het gastbesturingssysteem \autocite{RedHat2026,HashiCorp2025}. Een provisioner beperkt zich dus niet tot het beheren van de levenscyclus van een VM, maar zorgt er ook voor dat de machine in een bruikbare toestand wordt achtergelaten.
 
-Een belangrijk kenmerk van geautomatiseerde provisioning is herhaalbaarheid \autocite{IBM2025}. Wanneer dezelfde configuratie meerdere keren wordt uitgevoerd, moet dit in principe leiden tot een gelijkaardige omgeving. Dit is relevant in situaties waarin dezelfde omgeving door verschillende gebruikers of op verschillende momenten opnieuw moet worden opgebouwd. Een externe configuratie en geautomatiseerde scripts helpen om verschillen tussen manuele installaties te beperken.
+Een belangrijk kenmerk van geautomatiseerde provisioning is herhaalbaarheid \autocite{Holdsworth2025}. Wanneer dezelfde configuratie meerdere keren wordt uitgevoerd, moet dit in principe leiden tot een gelijkaardige omgeving. Dit is relevant in situaties waarin dezelfde omgeving door verschillende gebruikers of op verschillende momenten opnieuw moet worden opgebouwd. Een externe configuratie en geautomatiseerde scripts helpen om verschillen tussen manuele installaties te beperken.
 
 Provisioning bestaat doorgaans uit meerdere opeenvolgende stappen. Eerst wordt de infrastructuur aangemaakt of geselecteerd. Vervolgens worden de nodige hardware- en netwerkparameters ingesteld. Daarna wordt de machine gestart en bereikbaar gemaakt, waarna configuratiescripts of andere installatiestappen op het gastbesturingssysteem kunnen worden uitgevoerd.
 
@@ -68,9 +68,9 @@ Hoewel een provisioner verschillende taken kan automatiseren, blijft de uiteinde
 
 \section{Infrastructure as Code}
 
-Infrastructure as Code, afgekort als IaC, is een aanpak waarbij infrastructuur wordt beschreven en beheerd door middel van configuratiebestanden en programmatische definities \autocite{IBM2025}. In plaats van infrastructuur volledig handmatig te configureren, wordt de gewenste toestand beschreven in code of in een declaratief configuratiebestand. Deze configuratie kan daarna automatisch worden toegepast \autocite{IBM2025}.
+Infrastructure as Code, afgekort als IaC, is een aanpak waarbij infrastructuur wordt beschreven en beheerd door middel van configuratiebestanden en programmatische definities \autocite{Holdsworth2025}. In plaats van infrastructuur volledig handmatig te configureren, wordt de gewenste toestand beschreven in code of in een declaratief configuratiebestand. Deze configuratie kan daarna automatisch worden toegepast \autocite{Holdsworth2025}.
 
-Het gebruik van IaC heeft verschillende gevolgen voor de manier waarop infrastructuur wordt beheerd. Configuraties kunnen worden bijgehouden, hergebruikt en opnieuw uitgevoerd. Daardoor wordt het eenvoudiger om wijzigingen te controleren en om een omgeving opnieuw op te bouwen wanneer dat nodig is \autocite{IBM2025}. De configuratie vormt bovendien een expliciete beschrijving van de gewenste toestand van de omgeving \autocite{IBM2025}.
+Het gebruik van IaC heeft verschillende gevolgen voor de manier waarop infrastructuur wordt beheerd. Configuraties kunnen worden bijgehouden, hergebruikt en opnieuw uitgevoerd. Daardoor wordt het eenvoudiger om wijzigingen te controleren en om een omgeving opnieuw op te bouwen wanneer dat nodig is \autocite{Holdsworth2025}. De configuratie vormt bovendien een expliciete beschrijving van de gewenste toestand van de omgeving \autocite{Holdsworth2025}.
 
 Binnen IaC kan een onderscheid worden gemaakt tussen verschillende soorten tools. Provisioningtools richten zich op het creëren en beschikbaar maken van infrastructuur. Configuratiemanagementtools richten zich eerder op het installeren en configureren van software op bestaande systemen. Orchestrationtools bepalen daarnaast vaak de volgorde en samenwerking tussen verschillende systemen of taken.
 
@@ -80,9 +80,9 @@ Voor dit onderzoek is vooral het provisioninggedeelte van IaC relevant. De te on
 
 \section{Rust als programmeertaal}
 
-Rust is een programmeertaal die gericht is op het ontwikkelen van betrouwbare en efficiënte software. Een belangrijk onderdeel van Rust is het ownershipmodel. Dit model, samen met borrowing en lifetimes, laat de compiler geheugenveiligheid controleren tijdens het compileren. Volgens de officiële Rust-documentatie kan Rust hierdoor geheugenveiligheid garanderen zonder gebruik te maken van een garbage collector \autocite{Rust2025}.
+Rust is een programmeertaal die gericht is op het ontwikkelen van betrouwbare en efficiënte software. Een belangrijk onderdeel van Rust is het ownershipmodel. Dit model, samen met borrowing en lifetimes, laat de compiler geheugenveiligheid controleren tijdens het compileren. Volgens de officiële Rust-documentatie kan Rust hierdoor geheugenveiligheid garanderen zonder gebruik te maken van een garbage collector \autocite{Klabnik2018}.
 
-Het ownershipmodel bepaalt welke variabele eigenaar is van een waarde en wanneer die waarde automatisch wordt vrijgegeven. Borrowing maakt het mogelijk om tijdelijk naar data te verwijzen zonder het eigenaarschap over te dragen. Deze regels worden door de compiler gecontroleerd voordat het programma wordt uitgevoerd \autocite{Rust2025}.
+Het ownershipmodel bepaalt welke variabele eigenaar is van een waarde en wanneer die waarde automatisch wordt vrijgegeven. Borrowing maakt het mogelijk om tijdelijk naar data te verwijzen zonder het eigenaarschap over te dragen. Deze regels worden door de compiler gecontroleerd voordat het programma wordt uitgevoerd \autocite{Klabnik2018}.
 
 Rust is relevant voor het ontwikkelen van systeemgerichte software omdat programma's vaak rechtstreeks moeten samenwerken met processen, bestanden, netwerkverbindingen en het onderliggende besturingssysteem. Daarbij is niet alleen functionaliteit belangrijk, maar ook voorspelbaar gedrag wanneer een externe actie mislukt.
 
@@ -116,7 +116,6 @@ RustProv ondersteunt daarnaast functies voor statuscontrole, snapshots, herstell
 
 \section{Samenvatting}
 
-Provisioning bestaat uit het automatisch opbouwen en voorbereiden van IT-infrastructuur \autocite{RedHat2023}. Infrastructure as Code biedt een manier om de gewenste toestand van deze infrastructuur in configuratiebestanden vast te leggen en herhaalbaar toe te passen \autocite{IBM2025}. Rust biedt een geschikte basis voor de ontwikkeling van systeemgerichte software dankzij het ownershipmodel en de compile-time controle van geheugenveiligheid \autocite{Rust2025}.
+Provisioning bestaat uit het automatisch opbouwen en voorbereiden van IT-infrastructuur \autocite{RedHat2026}. Infrastructure as Code biedt een manier om de gewenste toestand van deze infrastructuur in configuratiebestanden vast te leggen en herhaalbaar toe te passen \autocite{Holdsworth2025}. Rust biedt een geschikte basis voor de ontwikkeling van systeemgerichte software dankzij het ownershipmodel en de compile-time controle van geheugenveiligheid \autocite{Klabnik2018}.
 
 Binnen deze bachelorproef worden deze concepten toegepast in RustProv. De tool combineert VirtualBox-beheer, externe TOML-configuratie, SSH-gebaseerde scriptuitvoering en ondersteuning voor virtuele Windows- en Linuxomgevingen. De volgende hoofdstukken bouwen hierop voort door eerst de requirements en de gekozen tools te bespreken en daarna het ontwerp en de implementatie van RustProv toe te lichten.
-

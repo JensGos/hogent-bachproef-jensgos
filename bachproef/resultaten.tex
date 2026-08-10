@@ -49,6 +49,16 @@ Dezelfde meetmethode wordt toegepast op RustProv en Vagrant. De gebruikte
 virtuele machines, configuraties, provisioningscripts en
 hardware-instellingen blijven daarbij gelijk.
 
+\subsection{Testplatform}
+
+De experimenten werden uitgevoerd op een x86-64-hostsysteem met Windows 11
+25H2, build 26200.8973. De computer is uitgerust met een AMD Ryzen 7 7800X3D
+processor, 32~GB RAM met een opgegeven snelheid van 5200 MT/s en een Samsung
+980 Pro SSD. Alle metingen voor RustProv en Vagrant werden op deze
+hostconfiguratie uitgevoerd, zodat beide provisioners onder dezelfde
+hardware- en softwareomstandigheden konden worden vergeleken.
+
+
 \subsection{PowerShell-meetscripts}
 
 Voor de meting van één virtuele machine wordt een afzonderlijk PowerShell-script
@@ -59,7 +69,72 @@ Listing~\ref{lst:meet-script-one-vm}.
 \begin{lstlisting}[language=bash,
     caption={PowerShell-script voor het meten van één virtuele machine.},
     label={lst:meet-script-one-vm}]
-    % Het PowerShell-meetscript voor één VM wordt hier ingevoegd.
+ $logFile = ".\execution_times_single.txt"
+ Clear-Content $logFile -ErrorAction SilentlyContinue
+ 
+ function Measure-CommandTime {
+     param (
+     [string]$Label,       
+     [int]$Iteration,    
+     [scriptblock]$Script 
+     )
+     
+     Write-Host "Running $Label loop $Iteration..." -ForegroundColor Cyan
+     
+     $global:CommandFailed = $false
+     
+     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+     
+     try {
+         & $Script
+         
+         if ($LASTEXITCODE -ne 0) {
+             $global:CommandFailed = $true
+         }
+     } catch {
+         $global:CommandFailed = $true
+     }
+     
+     $stopwatch.Stop()
+     $elapsed = $stopwatch.Elapsed
+     
+     $seconds = [math]::Round($elapsed.TotalSeconds, 2)
+     
+     if ($global:CommandFailed) {
+         Add-Content -Path $logFile -Value "$Label $Iteration ${seconds}sec (FAILED/CRASHED)"
+         Write-Host "$Label loop $Iteration exited early with an error!" -ForegroundColor Red
+     } else {
+         Add-Content -Path $logFile -Value "$Label $Iteration ${seconds}sec"
+     }
+ }
+ 
+ for ($i = 1; $i -le 4; $i++) {
+     Write-Host "--- STARTING ITERATION $i ---" -ForegroundColor Yellow
+     
+     Measure-CommandTime -Label "RustProv Start" -Iteration $i -Script {
+         .\app.exe start 
+     }
+     Measure-CommandTime -Label "RustProv  Provision" -Iteration $i -Script {
+         .\app.exe provision 
+     }
+     
+     Write-Host "Destroying the RustProv machines..." -ForegroundColor Gray
+     .\app.exe remove
+     .\app.exe kill
+     
+     Measure-CommandTime -Label "Vagrant Start" -Iteration $i -Script {
+         vagrant.exe up --no-provision 
+     }
+     Measure-CommandTime -Label "Vagrant Provision" -Iteration $i -Script {
+         vagrant.exe provision   
+     }
+     
+     Write-Host "Destroying the Vagrant machines..." -ForegroundColor Gray
+     vagrant.exe destroy -f
+     .\app.exe kill
+ }
+ 
+ Write-Host "Done!" -ForegroundColor Green
 \end{lstlisting}
 
 Voor scenario's met meerdere virtuele machines wordt een tweede PowerShell-script
@@ -70,7 +145,69 @@ Listing~\ref{lst:meet-script-multiple-vms}.
 \begin{lstlisting}[language=bash,
     caption={PowerShell-script voor het meten van meerdere virtuele machines.},
     label={lst:meet-script-multiple-vms}]
-    % Het PowerShell-meetscript voor meerdere VM's wordt hier ingevoegd.
+$logFile = ".\execution_times_multi.txt"
+Clear-Content $logFile -ErrorAction SilentlyContinue
+
+function Measure-CommandTime {
+    param (
+    [string]$Label,      
+    [int]$Iteration,     
+    [scriptblock]$Script 
+    )
+    
+    Write-Host "Running $Label loop $Iteration..." -ForegroundColor Cyan
+    
+    $global:CommandFailed = $false
+    
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    
+    try {
+        & $Script
+        
+        if ($LASTEXITCODE -ne 0) {
+            $global:CommandFailed = $true
+        }
+    } catch {
+        $global:CommandFailed = $true
+    }
+    
+    $stopwatch.Stop()
+    $elapsed = $stopwatch.Elapsed
+    
+    $seconds = [math]::Round($elapsed.TotalSeconds, 2)
+    
+    if ($global:CommandFailed) {
+        Add-Content -Path $logFile -Value "$Label $Iteration ${seconds}sec (FAILED/CRASHED)"
+        Write-Host "$Label loop $Iteration exited early with an error!" -ForegroundColor Red
+    } else {
+        Add-Content -Path $logFile -Value "$Label $Iteration ${seconds}sec"
+    }
+}
+
+for ($i = 1; $i -le 4; $i++) {
+    Write-Host "--- STARTING ITERATION $i ---" -ForegroundColor Yellow
+    
+    Measure-CommandTime -Label "linux rustprov single start vms" -Iteration $i -Script {
+        .\app.exe start --provision
+    }
+    
+    
+    Write-Host "Destroying the app machines..." -ForegroundColor Gray
+    .\app.exe remove
+    .\app.exe kill
+    
+    Measure-CommandTime -Label "linux vagrant multiple" -Iteration $i -Script {
+        vagrant.exe up 
+    }
+    
+    Write-Host "Destroying the vagrant machines..." -ForegroundColor Gray
+    vagrant.exe destroy -f
+    .\app.exe kill
+}
+
+
+Write-Host "Done!" -ForegroundColor Green
+   
 \end{lstlisting}
 
 Beide scripts registreren per meting minstens de gebruikte tool, het scenario en
@@ -80,7 +217,7 @@ verwerkt en het gemiddelde per scenario kan worden berekend.
 
 \section{Meting van één Linux-VM}
 
-Voor het eerste scenario werd één AlmaLinux-VM gebruikt. De starttijd en de
+Voor het eerste scenario werd één AlmaLinux9-VM gebruikt. De starttijd en de
 provisioningtijd werden afzonderlijk gemeten voor zowel RustProv als Vagrant. De
 VM werd voor elke nieuwe meting in dezelfde beginsituatie geplaatst.
 
@@ -102,10 +239,10 @@ respectievelijk \texttt{vagrant up} en \texttt{vagrant provision}.
         \textbf{Run 3 (s)} &
         \textbf{Gemiddelde (s)} \\
         \midrule
-        RustProv & Start & -- & -- & -- & -- \\
-        RustProv & Provisioning & -- & -- & -- & -- \\
-        Vagrant  & Start & -- & -- & -- & -- \\
-        Vagrant  & Provisioning & -- & -- & -- & -- \\
+        RustProv & Start & 6,30 & 6,88 & 6,10 & 6,43 \\
+        RustProv & Provisioning & 31,72 & 32,04 & 31,01 & 31,59 \\
+        Vagrant & Start & 32,07 & 32,04 & 31,86 & 31,99 \\
+        Vagrant & Provisioning & 3,76 & 3,65 & 3,64 & 3,68 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -115,9 +252,32 @@ gemiddelde uitvoeringstijden voor RustProv en Vagrant bij het scenario met één
 Linux-VM. De totale uitvoeringstijd wordt berekend door de gemiddelde starttijd
 en de gemiddelde provisioningtijd bij elkaar op te tellen.
 
+\subsection{Conclusie}
+
+Uit Tabel~\ref{tab:meting-een-linux} blijkt dat RustProv de Linux-VM sneller
+opstart dan Vagrant. RustProv heeft hiervoor gemiddeld 6,43 seconden nodig,
+terwijl Vagrant gemiddeld 31,99 seconden nodig heeft. Vagrant provisioned de VM
+daarentegen sneller dan RustProv. De gemiddelde provisioningtijd bedraagt
+31,59 seconden bij RustProv en 3,68 seconden bij Vagrant.
+
+Het verschil tussen beide provisioningtijden kan worden verklaard door de manier
+waarop RustProv de verbinding met de gastmachine opbouwt. RustProv wacht na het
+opstarten van de VM totdat de SSH-service beschikbaar is. Pas wanneer deze
+verbinding kan worden opgezet, begint RustProv met het uitvoeren van het
+provisioningsscript. Deze wachttijd maakt deel uit van de gemeten
+provisioningtijd.
+
+
+De gemiddelde totale uitvoeringstijd bedraagt 38,02 seconden voor RustProv en
+35,67 seconden voor Vagrant. Hoewel RustProv de VM aanzienlijk sneller opstart,
+wordt deze tijdswinst in dit scenario tenietgedaan door de langere
+provisioningtijd. Vagrant is daardoor in deze meting in totaal 2,35 seconden
+sneller.
+
+
 \section{Meting van meerdere Linux-VM's}
 
-Voor het tweede scenario werden drie AlmaLinux-VM's gebruikt. De VM's werden één
+Voor het tweede scenario werden drie AlmaLinux9-VM's gebruikt. De VM's werden één
 voor één opgestart en vervolgens één voor één geprovisioned. In tegenstelling tot
 het scenario met één Linux-VM wordt hier alleen de totale uitvoeringstijd van de
 volledige Linuxopstelling gemeten.
@@ -140,8 +300,8 @@ verschillende metingen gelijk bleef.
         \textbf{Run 3 (s)} &
         \textbf{Gemiddelde (s)} \\
         \midrule
-        RustProv & -- & -- & -- & -- \\
-        Vagrant  & -- & -- & -- & -- \\
+        RustProv & 580,13 & 541,94 & 521,14 & 547,74 \\
+        Vagrant  & 603,99 & 648,31 & 613,01 & 621,77 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -150,6 +310,18 @@ Tabel~\ref{tab:meting-meerdere-linux} toont de drie afzonderlijke metingen en
 het gemiddelde voor de volledige Linuxopstelling. De gemeten tijd omvat zowel
 het na elkaar opstarten van de drie VM's als het na elkaar uitvoeren van de
 bijhorende provisioningsscripts.
+
+\subsection{Conclusie}
+
+Uit Tabel~\ref{tab:meting-meerdere-linux} blijkt dat RustProv gemiddeld sneller
+is dan Vagrant bij het uitvoeren van de volledige Linuxopstelling. RustProv
+heeft gemiddeld 547,74 seconden nodig, terwijl Vagrant gemiddeld 621,77
+seconden nodig heeft.
+
+Het verschil tussen beide tools bedraagt gemiddeld 74,03 seconden in het
+voordeel van RustProv. Daarmee is RustProv op basis van deze metingen ongeveer
+11,9\% sneller dan Vagrant. Hoewel de uitvoeringstijd tussen de afzonderlijke
+runs varieert, is RustProv in alle drie de runs sneller dan Vagrant.
 
 \section{Meting van één Windows-VM}
 
@@ -220,6 +392,9 @@ Tabel~\ref{tab:meting-meerdere-windows} toont de drie afzonderlijke metingen en
 het gemiddelde voor de volledige Windowsopstelling. De gemeten tijd omvat zowel
 het na elkaar opstarten van de drie Windows-VM's als het na elkaar uitvoeren van
 de drie Windowsprovisioningsscripts.
+
+
+
 
 \section{Vergelijking tussen RustProv en Vagrant}
 \label{sec:vergelijking-rustprov-vagrant}

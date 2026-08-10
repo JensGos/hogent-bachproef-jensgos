@@ -57,13 +57,13 @@ Het derde script configureert de Windows-client binnen de meerledige Windowsomge
 
 \section{Linux-omgeving}
 
-Voor het Linux-scenario werd een opstelling voorzien met drie virtuele machines op basis van AlmaLinux. Deze omgeving is gebaseerd op een configuratie uit het vak Software Development Project (SDP) en werd gekozen omdat ze representatief is voor een typische Linux-opstelling binnen de opleiding.
+Voor het Linux-scenario werd een opstelling voorzien met drie virtuele machines op basis van AlmaLinux 9. Deze omgeving is gebaseerd op een configuratie uit het vak Software Development Project (SDP) en werd gekozen omdat ze representatief is voor een typische Linux-opstelling binnen de opleiding.
 
-De Linuxomgeving wordt zowel met RustProv als met Vagrant opgebouwd. Voor beide oplossingen worden dezelfde AlmaLinux-images, IP-adressen, hardware-instellingen en provisioningscripts gebruikt. Hierdoor kan de werking van RustProv onder dezelfde omstandigheden worden vergeleken met de bestaande Vagrant-aanpak.
+De Linuxomgeving wordt zowel met RustProv als met Vagrant opgebouwd. Voor beide oplossingen worden dezelfde AlmaLinux9-images, IP-adressen, hardware-instellingen en provisioningscripts gebruikt. Hierdoor kan de werking van RustProv onder dezelfde omstandigheden worden vergeleken met de bestaande Vagrant-aanpak.
 
 \subsection{Eén virtuele machine}
 
-Als eerste Linux-testgeval wordt één afzonderlijke AlmaLinux-VM gebruikt. Deze test heeft als doel te verifiëren of RustProv een enkele Linux-machine correct kan opstarten en provisionen. In tegenstelling tot de meerledige Linuxopstelling wordt in dit scenario een eenvoudig Bash-script gebruikt, zodat de basiswerking van de Linuxprovisioning afzonderlijk kan worden gecontroleerd.
+Als eerste Linux-testgeval wordt één afzonderlijke AlmaLinux9-VM gebruikt. Deze test heeft als doel te verifiëren of RustProv een enkele Linux-machine correct kan opstarten en provisionen. In tegenstelling tot de meerledige Linuxopstelling wordt in dit scenario een eenvoudig Bash-script gebruikt, zodat de basiswerking van de Linuxprovisioning afzonderlijk kan worden gecontroleerd.
 
 \paragraph{Provisioningscript voor één Linux-VM}
 
@@ -76,7 +76,7 @@ Het script voert enkele eenvoudige opdrachten uit op de gastmachine. Eerst wordt
     cat ~/hello.txt
 \end{lstlisting}
 
-Voor het experiment met één Linux-VM werd dezelfde configuratie opgesteld voor RustProv en Vagrant. Beide gebruiken dezelfde AlmaLinux-image, VM-naam, hardware-instellingen, netwerkadapter en het provisioningscript \texttt{00-hello.sh}. De configuraties worden weergegeven in Listing~\ref{lst:rustprov-linux-config-one} en Listing~\ref{lst:vagrant-linux-config-one}.
+Voor het experiment met één Linux-VM werd dezelfde configuratie opgesteld voor RustProv en Vagrant. Beide gebruiken dezelfde AlmaLinux9-image, VM-naam, hardware-instellingen, netwerkadapter en het provisioningscript \texttt{00-hello.sh}. De configuraties worden weergegeven in Listing~\ref{lst:rustprov-linux-config-one} en Listing~\ref{lst:vagrant-linux-config-one}.
 
 \begin{lstlisting}[language=bash,caption={RustProv-configuratie voor één Linux-VM.},label={lst:rustprov-linux-config-one}]
 [linuxbp]
@@ -112,7 +112,7 @@ end
 
 \subsection{Meerdere virtuele machines}
 
-Daarnaast wordt ook een Linux-opstelling met drie virtuele machines getest. Deze configuratie sluit aan bij een SDP-omgeving waarin meerdere AlmaLinux-systemen gelijktijdig worden ingezet. Het gebruik van meerdere Linux-VM's maakt het mogelijk om RustProv te evalueren in een scenario met meerdere nodes, afzonderlijke scripts en een gezamenlijke uitvoeringscontext.
+Daarnaast wordt ook een Linux-opstelling met drie virtuele machines getest. Deze configuratie sluit aan bij een SDP-omgeving waarin meerdere AlmaLinux9-systemen gelijktijdig worden ingezet. Het gebruik van meerdere Linux-VM's maakt het mogelijk om RustProv te evalueren in een scenario met meerdere nodes, afzonderlijke scripts en een gezamenlijke uitvoeringscontext.
 
 De drie VM's hebben elk een eigen rol binnen de testomgeving. De eerste VM wordt gebruikt voor de database en Loki. De tweede VM bevat de WordPress-installatie en Promtail. De derde VM wordt gebruikt voor de monitoring met Grafana. De configuratie van deze VM's is onderling verbonden, omdat WordPress gebruikmaakt van de database op de eerste VM en Grafana de loggegevens uit Loki kan gebruiken.
 
