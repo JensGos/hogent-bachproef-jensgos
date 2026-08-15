@@ -17,43 +17,370 @@ De Windowsomgeving wordt ook met Vagrant opgebouwd. Hierbij worden dezelfde VM-r
 
 \subsection{Eén virtuele machine}
 
-windows
+Als eerste Windows-testgeval wordt één afzonderlijke Windows 10-VM gebruikt. Deze test heeft als doel te verifiëren of RustProv een enkele Windows-machine correct kan opstarten en provisionen. In tegenstelling tot de meerledige Windows-opstelling wordt in dit scenario een eenvoudig PowerShell-script gebruikt, zodat de basiswerking van de Windows-provisioning afzonderlijk kan worden gecontroleerd.
 
 \paragraph{Provisioningscript}
 
-Het provisioningscript wordt gebruikt om de Windows-client voor te bereiden en de vereiste beheertools te installeren.
+Het provisioningscript wordt gebruikt om de Windows-client voor te bereiden en de vereiste beheertools te installeren. Het script schrijft eerst een tekstbericht naar de console. Vervolgens wordt een bestand aangemaakt waarin een tweede tekstbericht wordt opgeslagen. Ten slotte wordt de inhoud van dit bestand opnieuw weergegeven op de console. Op basis van deze uitvoer kan worden gecontroleerd of het script effectief op de juiste virtuele machine werd uitgevoerd.
 
-\begin{lstlisting}[language=bash,caption={Provisioningscript voor de Windows-client.}]
-    % Het Windows-provisioningscript wordt hier ingevoegd.
+\begin{lstlisting}[language=bash,caption={Provisioningscript voor één Windows-VM.},label={lst:bpwindows}]
+    Write-Host "Hello, World!"
+    Write-Host "Hello, World from a file!" > $HOME\hello.txt
+    Get-Content $HOME\hello.txt
+\end{lstlisting}
+
+Voor het experiment met één Windows-VM werd dezelfde configuratie opgesteld voor RustProv en Vagrant. Beide gebruiken dezelfde Windows 10-image, VM-naam, hardware-instellingen, netwerkadapter en het provisioningscript \texttt{00-hello.ps1}. De configuraties worden weergegeven in Listing~\ref{lst:rustprov-windows-config-one} en Listing~\ref{lst:vagrant-windows-config-one}.
+
+\begin{lstlisting}[language=bash,caption={RustProv-configuratie voor één Windows-VM.},label={lst:rustprov-windows-config-one}]
+    [windowsbp]
+    image = "windowsServer2025"
+    cores = 4
+    memory = 4096
+    script = ["00-hello.ps1"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+\end{lstlisting}
+
+\begin{lstlisting}[language=ruby,caption={Vagrant-configuratie voor één Windows-VM.},label={lst:vagrant-windows-config-one}]
+    Vagrant.configure("2") do |config|
+    windows.vm.box = "gusztavvargadr/windows-server-2025-standard-core"
+    windows.vm.box_version = "2601.0.0"
+    windows.vm.box_version = "2511.0.0"
+    windows.vm.hostname = "windowsbp"
+    windows.vm.communicator = "winrm"
+    windows.winrm.username = "vagrant"
+    windows.winrm.password = "vagrant"
+    windows.vm.network "public_network",
+    bridge: "Realtek Gaming 2.5GbE Family Controller"
+    windows.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+    end
+    windows.vm.provision "shell", path: "scripts/00-hello.ps1"
+    end
+    end
 \end{lstlisting}
 
 \subsection{Meerdere virtuele machines}
 
-windows
+Daarnaast wordt ook een Windows-opstelling met meerdere virtuele machines getest. Deze configuratie sluit aan bij een Windows Server-omgeving waarin meerdere systemen gelijktijdig worden ingezet, waaronder domeincontrollers en clients. Het gebruik van meerdere Windows-VM's maakt het mogelijk om RustProv te evalueren in een scenario met meerdere nodes, afzonderlijke scripts en een gezamenlijke uitvoeringscontext.
 
-\paragraph{Provisioningscript voor Windows Server 1}
+De drie VM's hebben elk een eigen rol binnen de testomgeving. De eerste VM wordt gebruikt als primaire domeincontroller. De tweede VM wordt gebruikt als secundaire domeincontroller of application server. De derde VM wordt gebruikt als Windows-client die toetreedt tot het domein. De configuratie van deze VM's is onderling verbonden, omdat de clients en secundaire server gebruikmaken van het Active Directory-domein dat op de eerste VM wordt ingericht.
 
-Het eerste script configureert Windows Server 1 en bereidt de machine voor op de rol die deze binnen de testomgeving vervult.
+Voor elke Windows-VM wordt een apart provisioningscript voorzien. Daardoor krijgt elke machine een eigen configuratie en rol binnen de bredere testomgeving. Deze aanpak maakt het mogelijk om te beoordelen of RustProv de juiste scriptstappen op de juiste machine uitvoert en of meerdere Windows-systemen correct volgens de gewenste volgorde kunnen worden verwerkt.
 
-\begin{lstlisting}[language=bash,caption={Provisioningscript voor Windows Server 1.}]
-    % Het provisioningscript voor Windows Server 1 wordt hier ingevoegd.
+Dezelfde drie VM-rollen, scripts en netwerkadressen worden ook in de Vagrant-configuratie opgenomen. Hierdoor worden de RustProv- en Vagrant-opstelling inhoudelijk gelijk gehouden.
+
+\subsubsection{Windows-script 1: Active Directory installatie}
+
+Dit script configureert Windows Server 1 en bereidt de machine voor op de rol van primaire domeincontroller. Het script stelt eerst een statisch IP-adres en DNS in, installeert vervolgens de rollen voor Active Directory Domain Services (AD DS) en DNS, en promoot de server tot domeincontroller door een nieuw AD-forest aan te maken. De configuratie hiervan wordt weergegeven in Listing~\ref{lst:win-ad-install}.
+
+\begin{lstlisting}[language=bash,caption={Windows-script 1: installatie van Active Directory.},label={lst:win-ad-install}]
+    $domainName = "WS2-25-jens.hogent"
+    $safeModePassword = "1243Vagrant@"
+    $staticIP = "192.168.0.10"
+    $prefixLength = 24
+    $interfaceAlias = "Ethernet 2"
+    
+    Write-Host "Setting Static IP Address for $interfaceAlias..."
+    
+    New-NetIPAddress -InterfaceAlias $interfaceAlias -IPAddress $staticIP -PrefixLength $prefixLength -ErrorAction Stop
+    Write-Host "IP address set to $staticIP/$prefixLength."
+    
+    Write-Host "Setting DNS Server address..."
+    Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses "127.0.0.1"
+    Write-Host "DNS server set to 127.0.0.1."
+    
+    
+    Write-Host "Installing Active Directory and DNS roles..."
+    Install-windowsfeature -name AD-Domain-Services,DNS -IncludeManagementTools
+    Write-Host "AD and DNS roles installed."
+    
+    $securePassword = ConvertTo-SecureString $safeModePassword -AsPlainText -Force
+    Write-Host "Creating new AD Forest with domain name $domainName..."
+    
+    
+    Install-ADDSForest -DomainName $domainName -DomainMode "Win2025" -ForestMode "Win2025" -InstallDns:$true -Force:$true -SafeModeAdministratorPassword $SecurePassword 
+    Write-Host "AD Forest created successfully. The server will now reboot to complete the installation."
 \end{lstlisting}
 
-\paragraph{Provisioningscript voor Windows Server 2}
+\subsubsection{Windows-script 2: Active Directory configuratie}
 
-Het tweede script configureert Windows Server 2 en voorziet de instellingen die nodig zijn voor de samenwerking met de andere VM's.
+Dit script voert de verdere configuratie van de domeincontroller uit nadat Active Directory is geïnstalleerd. Het maakt eerst de benodigde organisatorische eenheden (OUs) aan, zoals AdminAccounts, Finance, Human Resources en IT. Vervolgens worden de gebruikersaccounts aangemaakt en in de juiste OUs geplaatst. Gebruikers die als beheerder zijn gemarkeerd, worden ook toegevoegd aan de Domain Admins-groep. De configuratie hiervan wordt weergegeven in Listing~\ref{lst:win-ad-config}.
 
-\begin{lstlisting}[language=bash,caption={Provisioningscript voor Windows Server 2.}]
-    % Het provisioningscript voor Windows Server 2 wordt hier ingevoegd.
+\begin{lstlisting}[language=bash,caption={Windows-script 2: configuratie van Active Directory.},label={lst:win-ad-config}]
+    Write-Host "Waiting for Active Directory to become responsive..."
+    $timeout2 = New-TimeSpan -Minutes 10
+    $stopwatch2 = [System.Diagnostics.Stopwatch]::StartNew()
+    
+    while ($stopwatch2.Elapsed -lt $timeout2) {
+        try {
+            Get-ADDomain -ErrorAction Stop | Out-Null
+            Write-Host "Active Directory is responsive."
+            break
+        } catch {
+            Write-Host "Waiting for Active Directory to respond... (checked for $([int]$stopwatch2.Elapsed.TotalSeconds) seconds)"
+            Start-Sleep -Seconds 5
+        }
+    }
+    
+    if ($stopwatch2.Elapsed -ge $timeout2) {
+        Write-Error "Active Directory did not become responsive within the $($timeout2.TotalMinutes) minute timeout period."
+        exit 1
+    }
+    $domainName = "WS2-25-jens.hogent"
+    $password = "1243Vagrant@" | ConvertTo-SecureString -AsPlainText -Force
+    
+    $baseDN = ($domainName.Split('.') | ForEach-Object { "DC=$_" }) -join ','
+    Write-Host "Base DN calculated as: $baseDN"
+    
+    $ous = @("AdminAccounts", "Finance", "Human Resources", "IT")
+    $users = @(
+    @{ Name = "Jens Gosseye"; OU = "AdminAccounts"; IsAdmin = $true },
+    @{ Name = "Geert Gossye"; OU = "AdminAccounts"; IsAdmin = $true },
+    @{ Name = "Steven Stone"; OU = "Finance"; IsAdmin = $false },
+    @{ Name = "Mario Mario"; OU = "Human Resources"; IsAdmin = $false }
+    )
+    
+    Write-Host "Creating OUs..."
+    foreach ($ou in $ous) {
+        if (-not (Get-ADOrganizationalUnit -Filter "Name -eq '$ou'")) {
+            New-ADOrganizationalUnit -Name $ou -Path $baseDN
+            Write-Host "- OU '$ou' created."
+        } else {
+            Write-Host "- OU '$ou' already exists."
+        }
+    }
+    
+    Write-Host "Creating Users..."
+    foreach ($user in $users) {
+        $samAccountName = $user.Name.Replace(" ", ".")
+        $userPrincipalName = "$samAccountName@$domainName"
+        $ouPath = "OU=$($user.OU),$baseDN"
+        
+        if (-not (Get-ADUser -Filter "SamAccountName -eq '$samAccountName'")) {
+            New-ADUser -Name $user.Name -SamAccountName $samAccountName -UserPrincipalName $userPrincipalName -AccountPassword $password -Enabled $true -Path $ouPath
+            Write-Host "- User '$($user.Name)' created in OU '$($user.OU)'."
+            if ($user.IsAdmin) {
+                Add-ADGroupMember -Identity "Domain Admins" -Members $samAccountName
+                Write-Host "  - Added '$($user.Name)' to Domain Admins."
+            }
+        } else {
+            Write-Host "- User '$($user.Name)' already exists."
+        }
+    }
 \end{lstlisting}
 
-\paragraph{Provisioningscript voor de Windows-client}
+\subsubsection{Windows-script 3: DNS-configuratie}
 
-Het derde script configureert de Windows-client binnen de meerledige Windowsomgeving.
+Dit script voert de DNS-configuratie uit op de primaire domeincontroller. Het stelt de DNS-client in op beide netwerkadapters, configureert forwarders naar externe DNS-servers en maakt de benodigde forward en reverse lookup zones aan. Vervolgens worden de A- en PTR-records voor de server toegevoegd en wordt de zone-overdracht geconfigureerd zodat de secundaire DNS-server de zones kan repliceren. De configuratie hiervan wordt weergegeven in Listing~\ref{lst:win-dns-config}.
 
-\begin{lstlisting}[language=bash,caption={Provisioningscript voor de Windows-client in de meerledige opstelling.}]
-    % Het provisioningscript voor de Windows-client wordt hier ingevoegd.
+\begin{lstlisting}[language=bash,caption={Windows-script 3: DNS-configuratie.},label={lst:win-dns-config}]
+    $domainName = "WS2-25-jens.hogent"
+    $primaryDnsServer = "192.168.0.10"
+    $reverseZoneName = "0.168.192.in-addr.arpa"
+    $networkId = "192.168.0.0/24"
+    
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet 2" -ServerAddresses $primaryDnsServer -ErrorAction SilentlyContinue
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses $primaryDnsServer -ErrorAction SilentlyContinue
+    
+    Set-DnsServerForwarder -IPAddress "8.8.8.8", "1.1.1.1" -PassThru
+    
+    if (-not (Get-DnsServerZone -Name $reverseZoneName -ErrorAction SilentlyContinue)) {
+        Add-DnsServerPrimaryZone -NetworkID $networkId -ReplicationScope "Domain" -PassThru
+        Write-Host "- Reverse Lookup Zone '$reverseZoneName' created."
+    } else {
+        Write-Host "- Reverse Lookup Zone '$reverseZoneName' already exists."
+    }
+    
+    Write-Host "Creating Forward Lookup Zone..."
+    if (-not (Get-DnsServerZone -Name $domainName -ErrorAction SilentlyContinue)) {
+        Add-DnsServerPrimaryZone -Name $domainName -ReplicationScope Domain -DynamicUpdate Secure
+        Write-Host "- Forward Lookup Zone '$domainName' created."
+    } else {
+        Write-Host "- Forward Lookup Zone '$domainName' already exists."
+    }
+    
+    if (-not (Get-DnsServerResourceRecord -Name "server1" -ZoneName $domainName -RRType "A" -ErrorAction SilentlyContinue)) {
+        Add-DnsServerResourceRecordA -Name "server1" -ZoneName $domainName -IPv4Address $primaryDnsServer
+        Write-Host "- Created 'server1' A record."
+    } else {
+        Write-Host "- 'server1' A record already exists."
+    }
+    
+    if (-not (Get-DnsServerResourceRecord -Name "10" -ZoneName $reverseZoneName -RRType "Ptr" -ErrorAction SilentlyContinue)) {
+        Add-DnsServerResourceRecordPtr -Name "10" -ZoneName $reverseZoneName -PtrDomainName "server1.$domainName"
+        Write-Host "- Created PTR record for 'server1'."
+    } else {
+        Write-Host "- PTR record for 'server1' already exists."
+    }
+    
+    
+    Set-DnsServerPrimaryZone -Name $domainName -SecureSecondaries "TransferToSecureServers" -SecondaryServers $secondaryDnsServer -PassThru
+    
+    Write-Host "DNS configuration complete."
 \end{lstlisting}
+
+\subsubsection{Windows-script 4: secundaire server}
+
+Dit script configureert Windows Server 2 en voorziet de instellingen die nodig zijn voor de samenwerking met de primaire domeincontroller. Het stelt eerst een statisch IP-adres in en wijzigt de DNS-server naar de primaire domeincontroller. Vervolgens controleert het script of de server reeds lid is van het domein. Indien niet, dan treedt de server toe tot het bestaande Active Directory-domein. De configuratie hiervan wordt weergegeven in Listing~\ref{lst:win-server2}.
+
+\begin{lstlisting}[language=bash,caption={Windows-script 3: toetreden tot Active Directory.},label={lst:win-server2}]
+    $domainName = "WS2-25-jens.hogent"
+    $adminPassword = "1243Vagrant@"
+    
+    
+    $ip = "192.168.0.20"
+    $interface = "Ethernet 2"
+    $dns = "192.168.0.10"
+    
+    $currentIP = Get-NetIPAddress -InterfaceAlias $interface -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.IPAddress -eq $ip }
+    if (-not $currentIP) {
+        Write-Host "Setting Static IP Address for Server 2..."
+        New-NetIPAddress -InterfaceAlias $interface -IPAddress $ip -PrefixLength 24 | Out-Null
+        Write-Host "IP address set to $ip/24."
+    } else {
+        Write-Host "IP address $ip is already set on $interface."
+    }
+    
+    Write-Host "Setting DNS server to $dns..."
+    Set-DnsClientServerAddress -InterfaceAlias $interface -ServerAddresses $dns
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses $dns
+    Write-Host "DNS server set."
+    
+    
+    $computerInfo = Get-ComputerInfo
+    if ($computerInfo.Domain -ne $domainName) {
+        Write-Host "Joining domain $domainName..."
+        $credential = New-Object System.Management.Automation.PSCredential("Jens.Gosseye@$domainName", (ConvertTo-SecureString $adminPassword -AsPlainText -Force))
+        Add-Computer -DomainName $domainName -Credential $credential
+        Write-Host "Joined domain. The server will reboot."
+    } else {
+        Write-Host "Computer is already joined to the domain '$domainName'."
+    }
+\end{lstlisting}
+
+\subsubsection{Windows-script 5: Windows-client}
+
+Dit script configureert de Windows-client binnen de meerledige Windows-omgeving. Het stelt eerst een statisch IP-adres in en wijzigt de DNS-server op beide netwerkadapters naar de primaire domeincontroller. Vervolgens wordt de DNS-cache geleegd en wordt gecontroleerd of de client reeds lid is van het domein. Indien niet, dan treedt de client toe tot het bestaande Active Directory-domein. De configuratie hiervan wordt weergegeven in Listing~\ref{lst:win-client}.
+
+\begin{lstlisting}[language=bash,caption={Windows-script 4: Windows-client toetreden tot Active Directory.},label={lst:win-client}]
+    Write-Host "Starting Client Domain Join for WS2-25-jens.hogent..."  
+    $domainName = "WS2-25-jens.hogent"
+    $adminPassword = "1243Vagrant@"
+    $user = "Jens.Gosseye@$domainName"
+    
+    $ip = "192.168.0.15"
+    $interface = "Ethernet 2"
+    $natAlias = "Ethernet"
+    $dns = "192.168.0.10"
+    
+    $currentIP = Get-NetIPAddress -InterfaceAlias $interface -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.IPAddress -eq $ip }
+    if (-not $currentIP) {
+        Write-Host "Setting Static IP Address for Client..."
+        New-NetIPAddress -InterfaceAlias $interface -IPAddress $ip -PrefixLength 24 | Out-Null
+        Write-Host "IP address set to $ip/24."
+    } else {
+        Write-Host "IP address $ip is already set on $interface."
+    }
+    
+    Write-Host "Setting DNS server to $dns on both adapters to prevent leakage..."
+    Set-DnsClientServerAddress -InterfaceAlias $interface -ServerAddresses $dns
+    Set-DnsClientServerAddress -InterfaceAlias $natAlias -ServerAddresses $dns
+    Write-Host "DNS servers updated."
+    
+    Write-Host "Flushing DNS cache so Windows sees the new routing..."
+    Clear-DnsClientCache
+    Start-Sleep -Seconds 3
+    
+    $computerInfo = Get-ComputerInfo
+    if ($computerInfo.Domain -ne $domainName) {
+        Write-Host "Joining domain $domainName..."
+        $securePass = ConvertTo-SecureString $adminPassword -AsPlainText -Force
+        $credential = New-Object System.Management.Automation.PSCredential($user, $securePass)
+        
+        Add-Computer -DomainName $domainName -Credential $credential -Force
+        
+        Write-Host "Joined domain successfully! The machine is rebooting now..."
+        Restart-Computer -Force
+    } else {
+        Write-Host "Computer is already joined to the domain '$domainName'."
+    }
+\end{lstlisting}
+
+Voor de Windows-experimenten werd dezelfde VM-opstelling beschreven in zowel een TOML-configuratiebestand voor RustProv als een \texttt{Vagrantfile} voor Vagrant. Op die manier wordt ervoor gezorgd dat beide provisioners dezelfde virtuele machines, hardware-instellingen, netwerkadapter en provisioningscripts gebruiken. Bij RustProv werd wel een wachttijd van 360 seconden toegevoegd om te wachten tot Active Directory volledig beschikbaar is. Bij Vagrant gebeurt dit wachten automatisch. De configuraties worden weergegeven in Listing~\ref{lst:rustprov-windows-config} en Listing~\ref{lst:vagrant-windows-config}.
+
+\begin{lstlisting}[language=bash,caption={RustProv-configuratie voor meerdere Windows-VM's.},label={lst:rustprov-windows-config}]
+    [windowsad1]
+    image = "windowsServer2025"
+    cores = 4
+    memory = 4096
+    script = ["AD-Server1.ps1","wait(360)","ConfigureAD-Server1.ps1","DNS-Server1.ps1"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+    
+    
+    [windowsad2]
+    image = "windowsServer2025"
+    cores = 4
+    memory = 4096
+    script = ["JoinAD-Server2.ps1"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+    
+    [windowsclient]
+    image = "windows10"
+    cores = 4
+    memory = 4096
+    script = ["JoinAD-Client.ps1"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+    \end{lstlisting}
+
+\begin{lstlisting}[language=ruby,caption={Vagrant-configuratie voor meerdere Windows-VM's.},label={lst:vagrant-windows-config}]
+    Vagrant.configure("2") do |config|
+    config.vm.communicator = "winrm"
+    config.winrm.username = "vagrant"
+    config.winrm.password = "vagrant"
+    config.vm.define "windowsad1" do |ad1|
+    ad1.vm.box = "gusztavvargadr/windows-server-2025-standard-core"
+    ad1.vm.box_version = "2601.0.0"
+    ad1.vm.hostname = "windowsad1"   
+    ad1.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller" 
+    ad1.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+    end
+    ad1.vm.provision "install-ad", type: "shell", path: "scripts/AD-Server1.ps1"    
+    ad1.vm.provision "configure-ad", type: "shell", path: "scripts/ConfigureAD-Server1.ps1",reboot: true
+    ad1.vm.provision "dns-server", type: "shell", path: "scripts/DNS-Server1.ps1"
+    ad1.vm.boot_timeout = 600
+    end
+    config.vm.define "windowsad2" do |ad2|
+    ad2.vm.box = "gusztavvargadr/windows-server-2025-standard-core"
+    ad2.vm.box_version = "2601.0.0"
+    ad2.vm.hostname = "windowsad2"   
+    ad2.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller" 
+    ad2.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+    end
+    ad2.vm.provision "shell", path: "scripts/JoinAD-Server2.ps1"
+    ad2.vm.boot_timeout = 600
+    end
+    config.vm.define "windowsclient" do |client|
+    client.vm.box = "gusztavvargadr/windows-10-22h2-enterprise"
+    client.vm.box_version = "2511.0.0"
+    client.vm.hostname = "windowsclient" 
+    client.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller" 
+    client.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+    end
+    client.vm.provision "shell", path: "scripts/JoinAD-Client.ps1"
+    client.vm.boot_timeout = 600
+    end
+    end
+\end{lstlisting}
+
+
+
 
 \section{Linux-omgeving}
 
@@ -79,34 +406,30 @@ Het script voert enkele eenvoudige opdrachten uit op de gastmachine. Eerst wordt
 Voor het experiment met één Linux-VM werd dezelfde configuratie opgesteld voor RustProv en Vagrant. Beide gebruiken dezelfde AlmaLinux9-image, VM-naam, hardware-instellingen, netwerkadapter en het provisioningscript \texttt{00-hello.sh}. De configuraties worden weergegeven in Listing~\ref{lst:rustprov-linux-config-one} en Listing~\ref{lst:vagrant-linux-config-one}.
 
 \begin{lstlisting}[language=bash,caption={RustProv-configuratie voor één Linux-VM.},label={lst:rustprov-linux-config-one}]
-[linuxbp]
-image = "almalinux9"
-cores = 4
-memory = 4096
-script = ["00-hello.sh"]
-bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
+    [linuxbp]
+    image = "almalinux9"
+    cores = 4
+    memory = 4096
+    script = ["00-hello.sh"]
+    bridgeNetwork = "Realtek Gaming 2.5GbE Family Controller"
 \end{lstlisting}
 
 
 \begin{lstlisting}[language=ruby,caption={Vagrant-configuratie voor één Linux-VM},label={lst:vagrant-linux-config-one}]
-Vagrant.configure("2") do |config|
-config.vm.define "linuxbp" do |linux|
-linux.vm.box = "almalinux/9"
-linux.vm.box_version = "9.7.20260518"
-linux.vm.hostname = "linuxbp"
-linux.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller", auto_config: false
-linux.vm.provider "virtualbox" do |vb|
-vb.memory = 4096
-vb.cpus = 4
-end
-linux.vm.provision "shell", path: "scripts/00-hello.sh"
-end
-end
-
+    Vagrant.configure("2") do |config|
+    config.vm.define "linuxbp" do |linux|
+    linux.vm.box = "almalinux/9"
+    linux.vm.box_version = "9.7.20260518"
+    linux.vm.hostname = "linuxbp"
+    linux.vm.network "public_network", bridge: "Realtek Gaming 2.5GbE Family Controller", auto_config: false
+    linux.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 4
+    end
+    linux.vm.provision "shell", path: "scripts/00-hello.sh"
+    end
+    end
 \end{lstlisting}
-
-
-
 
 
 
@@ -586,20 +909,3 @@ Listing~\ref{lst:vagrant-linux-config}.
     end
     end
 \end{lstlisting}
-
-
-
-
-TOE TE VOEGEN
-1 LINUX
-MULTI LINUX
-1 WINDOWS
-MULTI WINDOWS
-
-Tijd testen na elkaar
-
-Tijd testen apart -> aanmaken vm -> daarna provisionen niet aanmaken en provisoinen
-
-
-
-TOML voor rustpov Vagrantfile voor vagrant voor de config

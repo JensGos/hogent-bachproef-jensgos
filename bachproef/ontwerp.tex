@@ -14,7 +14,19 @@ Naast de kernfuncties bevat RustProv verschillende ondersteunende functies die h
 
 Tot slot bevat RustProv ook functies die bedoeld zijn voor herstel en foutafhandeling. De functie \texttt{restore} laat toe om een eerder opgeslagen snapshot opnieuw in te laden, terwijl \texttt{kill} als noodmaatregel wordt gebruikt wanneer VirtualBox niet meer correct reageert. Deze uitbreidingen zijn niet strikt noodzakelijk voor de basiswerking van de tool, maar verhogen wel de betrouwbaarheid en robuustheid van het systeem.
 
-\subsection{Provisioningworkflow}
+\section{Images}
+
+Voor het aanmaken van een virtuele machine wordt een VDI-image gebruikt. Deze image wordt vooraf aangemaakt en bij het aanmaken van de VM gekoppeld als virtuele schijf.
+
+\subsection{Linux Images}
+
+Voor de Linux-images wordt een gebruiker \texttt{test} aangemaakt met wachtwoord \texttt{test}. De SSH-server moet actief zijn en verbinding via deze gebruiker moet mogelijk zijn via poort \texttt{22}. De gebruiker \texttt{test} beschikt over \texttt{sudo}-rechten om de provisioningsscripts uit te voeren.
+
+\subsection{Windows Images}
+
+Voor de Windows-images wordt eveneens een gebruiker \texttt{test} aangemaakt. Voor deze gebruiker wordt ingesteld dat het wachtwoord niet verloopt. De OpenSSH-server moet geïnstalleerd zijn en poort 22 moet openstaan. Daarnaast wordt het programma \texttt{PsExec} van PSTools gedownload, zodat scripts met administratorrechten kunnen worden uitgevoerd. Tot slot wordt \texttt{sysprep} uitgevoerd, zodat de Windows-VM herbruikbaar is. Zonder deze stap zouden conflicten kunnen optreden door identieke Security identifiers (SID) bij meerdere VM's.
+
+\section{Provisioningworkflow}
 
 De provisioningworkflow volgt een vaste volgorde. Eerst wordt de configuratie ingelezen, daarna wordt de VM aangemaakt of herkend, vervolgens wordt netwerktoegang geconfigureerd en pas daarna wordt via SSH een script uitgevoerd op de gastmachine. Deze volgorde is bewust gekozen, omdat provisioning enkel betrouwbaar kan verlopen wanneer de VM eerst bereikbaar is en de juiste netwerkparameters beschikbaar zijn. 
 

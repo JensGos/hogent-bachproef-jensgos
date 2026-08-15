@@ -241,8 +241,10 @@ respectievelijk \texttt{vagrant up} en \texttt{vagrant provision}.
         \midrule
         RustProv & Start & 6,30 & 6,88 & 6,10 & 6,43 \\
         RustProv & Provisioning & 31,72 & 32,04 & 31,01 & 31,59 \\
-        Vagrant & Start & 32,07 & 32,04 & 31,86 & 31,99 \\
-        Vagrant & Provisioning & 3,76 & 3,65 & 3,64 & 3,68 \\
+        RustProv & Totaal & 38,02 & 38,92 & 37,11 & 38,02 \\
+        Vagrant  & Start & 32,07 & 32,04 & 31,86 & 31,99 \\
+        Vagrant  & Provisioning & 3,76 & 3,65 & 3,64 & 3,68 \\
+        Vagrant  & Totaal & 35,83 & 35,69 & 35,50 & 35,67 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -346,10 +348,12 @@ configuratiestappen.
         \textbf{Run 3 (s)} &
         \textbf{Gemiddelde (s)} \\
         \midrule
-        RustProv & Start & -- & -- & -- & -- \\
-        RustProv & Provisioning & -- & -- & -- & -- \\
-        Vagrant  & Start & -- & -- & -- & -- \\
-        Vagrant  & Provisioning & -- & -- & -- & -- \\
+        RustProv & Start & 52,33 & 53,23 & 53,97 & 53,18 \\
+        RustProv & Provisioning & 24,11 & 24,12 & 23,48 & 23,90 \\
+        RustProv & Totaal & 76,44 & 77,35 & 77,45 & 77,08 \\
+        Vagrant  & Start & 122,26 & 118,77 & 116,07 & 119,03 \\
+        Vagrant  & Provisioning & 16,99 & 17,18 & 16,70 & 16,96 \\
+        Vagrant  & Totaal & 139,25 & 135,95 & 132,77 & 135,99 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -358,6 +362,29 @@ Tabel~\ref{tab:meting-een-windows} toont de afzonderlijke metingen en de
 gemiddelde uitvoeringstijden voor RustProv en Vagrant bij het scenario met één
 Windows-VM. De gemiddelde waarden worden gebruikt om de uitvoeringstijd van
 beide provisioners met elkaar te vergelijken.
+
+
+\subsection{Conclusie}
+
+Uit Tabel~\ref{tab:meting-een-windows} blijkt dat RustProv de Windows-VM sneller
+opstart en provisioned dan Vagrant. RustProv heeft gemiddeld 53,18 seconden
+nodig voor het opstarten en 23,90 seconden voor het provisionen, wat resulteert
+in een totale uitvoeringstijd van 77,08 seconden. Vagrant heeft gemiddeld
+119,03 seconden nodig voor het opstarten en 16,96 seconden voor het provisionen,
+wat resulteert in een totale uitvoeringstijd van 135,99 seconden.
+
+Het verschil in uitvoeringstijd kan worden verklaard door de lichtere
+configuratie die RustProv toepast op de Windows-VM. Bij RustProv worden enkel de
+CID en enkele basisinstellingen aangepast, terwijl de hostname en de public keys
+niet worden gewijzigd. Bij Vagrant worden daarentegen meer configuratiestappen
+uitgevoerd, zoals het wijzigen van de hostname en het genereren van nieuwe
+SSH-sleutels. Deze extra stappen maken de Vagrant-opstart zwaarder en trager,
+maar zorgen ook voor een meer grondige configuratie van de VM.
+
+Op basis van deze metingen is RustProv in totaal 58,91 seconden sneller dan
+Vagrant bij het opstarten en provisionen van één Windows-VM. Dit verschil is
+voornamelijk te wijten aan de snellere opstarttijd van RustProv, terwijl Vagrant
+wel iets sneller is bij het eigenlijke provisionen.
 
 \section{Meting van meerdere Windows-VM's}
 
@@ -382,8 +409,8 @@ Windowsprovisioningsscripts na elkaar succesvol zijn uitgevoerd.
         \textbf{Run 3 (s)} &
         \textbf{Gemiddelde (s)} \\
         \midrule
-        RustProv & -- & -- & -- & -- \\
-        Vagrant  & -- & -- & -- & -- \\
+        RustProv & 552,82 & 573,91 & 541,46 & 556,06 \\
+        Vagrant  & 1029,23 & 1026,01 & 1029,23 & 1028,16 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -394,7 +421,31 @@ het na elkaar opstarten van de drie Windows-VM's als het na elkaar uitvoeren van
 de drie Windowsprovisioningsscripts.
 
 
+\subsection{Conclusie}
 
+Uit Tabel~\ref{tab:meting-meerdere-windows} blijkt dat RustProv aanzienlijk
+sneller is dan Vagrant bij het uitvoeren van de volledige Windows-opstelling met
+meerdere VM's. RustProv heeft gemiddeld 556,06 seconden nodig, terwijl Vagrant
+gemiddeld 1028,16 seconden nodig heeft. Het verschil bedraagt gemiddeld
+472,10 seconden in het voordeel van RustProv.
+
+Dit grote verschil kan worden verklaard door de manier waarop beide tools de
+configuratie en het provisionen van meerdere Windows-VM's aanpakken. Bij Vagrant
+gebeurt de configuratie van elke Windows-VM tijdens het opstarten in de
+voorgrond. Vagrant wacht tot de configuratie van de huidige VM volledig is
+afgerond, inclusief eventuele herstarten, voordat wordt overgegaan naar de
+volgende VM. Pas daarna begint het provisionen van de volgende machine.
+
+Bij RustProv wordt de configuratie van de Windows-VM's daarentegen op de
+achtergrond uitgevoerd. Terwijl de ene VM nog wordt geconfigureerd, kan RustProv
+reeds beginnen met het opstarten en provisionen van een andere VM. Hierdoor
+worden wachttijden tussen de verschillende VM's verminderd. Bovendien wordt bij
+RustProv de SSH-verbinding verbroken op het moment dat het provisioningscript
+klaar is, terwijl Vagrant wacht tot de VM volledig is herstart voordat de
+verbinding wordt verbroken.
+
+Op basis van deze metingen is RustProv gemiddeld 472,10 seconden sneller dan
+Vagrant bij het uitvoeren van de volledige Windows-opstelling met meerdere VM's.
 
 \section{Vergelijking tussen RustProv en Vagrant}
 \label{sec:vergelijking-rustprov-vagrant}
