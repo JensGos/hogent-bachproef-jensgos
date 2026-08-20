@@ -67,7 +67,7 @@ Deze keuze was nodig omdat Windows-provisioning andere eisen stelt dan Linux-pro
 
 \section{Sysprep}
 
-Bij het provisionen van Windows-VM's kunnen er botsingen optreden binnen Active Directory wanneer meerdere machines dezelfde volledige naam (FQDN) of dezelfde Security Identifier (SID)  hebben \autocite{MicrosoftSID2025}. Om dit te voorkomen, moet elke VM een unieke identiteit krijgen. Hiervoor wordt Sysprep gebruikt \autocite{MicrosoftSysprep2021}.
+Bij het provisionen van Windows-VM's kunnen er botsingen optreden binnen Active Directory wanneer meerdere machines dezelfde Security Identifier (SID)  hebben \autocite{MicrosoftSID2025}. Om dit te voorkomen, moet elke VM een unieke identiteit krijgen. Hiervoor wordt Sysprep gebruikt \autocite{MicrosoftSysprep2021}.
 
 Sysprep is een tool die een Windows-installatie generaliseert door systeemspecifieke gegevens zoals de SID, de computernaam en bepaalde registerinstellingen te verwijderen. Na het uitvoeren van Sysprep kan een nieuwe unieke identiteit worden gegenereerd wanneer de VM voor het eerst opstart \autocite{MicrosoftSysprep2021,Russinovich2009}. In deze opstelling wordt Sysprep als volgt uitgevoerd:
 

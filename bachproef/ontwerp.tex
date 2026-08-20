@@ -50,6 +50,12 @@ Bij Linuxprovisioning wordt het script via SSH uitgevoerd in combinatie met \tex
 
 Windowsprovisioning vereist een andere aanpak. De scripts worden niet op dezelfde manier uitgevoerd als bij Linux, omdat de standaard SSH-aanpak niet altijd volstaat voor systeemwijzigingen. Daarom wordt een aparte uitvoeringsmethode gebruikt die meer overeenkomt met de vereisten van Windowsbeheer. De tool voert eerst de nodige netwerkconfiguratie uit, waarna het script in de gepaste context wordt gestart. 
 
+
+\section{Netwerkadapters}
+
+Voor de provisioner is enkel toegang voorzien tot de NAT-adapter, die gebruikt wordt voor het provisionen, en een optionele bridge-adapter. Deze twee netwerkadapters zijn de enige die beschikbaar zijn in RustProv. Ze zijn gekozen om de kernfunctionaliteit van een provisioner te ondersteunen. Er zijn geen extra netwerkadapters toegevoegd, omdat dit zou leiden tot feature creep: het toevoegen van extra functionaliteit die niet noodzakelijk is voor een proof of concept.
+
+
 \section{Uitbreidingen}
 
 Naast de basisfuncties bevat RustProv meerdere uitbreidingen die de tool robuuster en bruikbaarder maken. Deze uitbreidingen werden toegevoegd omdat een provisioner in een labo-omgeving niet alleen correct moet werken, maar ook moet kunnen herstellen van fouten en zich moet aanpassen aan verschillende scenario's. 
