@@ -256,25 +256,11 @@ en de gemiddelde provisioningtijd bij elkaar op te tellen.
 
 \subsection{Conclusie}
 
-Uit Tabel~\ref{tab:meting-een-linux} blijkt dat RustProv de Linux-VM sneller
-opstart dan Vagrant. RustProv heeft hiervoor gemiddeld 6,43 seconden nodig,
-terwijl Vagrant gemiddeld 31,99 seconden nodig heeft. Vagrant provisioned de VM
-daarentegen sneller dan RustProv. De gemiddelde provisioningtijd bedraagt
-31,59 seconden bij RustProv en 3,68 seconden bij Vagrant.
+Uit Tabel~\ref{tab:meting-een-linux} blijkt dat RustProv de Linux-VM sneller opstart dan Vagrant. RustProv heeft hiervoor gemiddeld 6,43 seconden nodig, terwijl Vagrant gemiddeld 31,99 seconden nodig heeft. Vagrant provisioned de VM daarentegen sneller dan RustProv. De gemiddelde provisioningtijd bedraagt 31,59 seconden bij RustProv en 3,68 seconden bij Vagrant.
 
-Het verschil tussen beide provisioningtijden kan worden verklaard door de manier
-waarop RustProv de verbinding met de gastmachine opbouwt. RustProv wacht na het
-opstarten van de VM totdat de SSH-service beschikbaar is. Pas wanneer deze
-verbinding kan worden opgezet, begint RustProv met het uitvoeren van het
-provisioningsscript. Deze wachttijd maakt deel uit van de gemeten
-provisioningtijd.
+Het verschil tussen beide provisioningtijden kan worden verklaard door de manier waarop RustProv de verbinding met de gastmachine opbouwt. RustProv wacht na het opstarten van de VM totdat de SSH-service beschikbaar is. Pas wanneer deze verbinding kan worden opgezet, begint RustProv met het uitvoeren van het provisioningsscript. Deze wachttijd maakt deel uit van de gemeten provisioningtijd.
 
-
-De gemiddelde totale uitvoeringstijd bedraagt 38,02 seconden voor RustProv en
-35,67 seconden voor Vagrant. Hoewel RustProv de VM aanzienlijk sneller opstart,
-wordt deze tijdswinst in dit scenario tenietgedaan door de langere
-provisioningtijd. Vagrant is daardoor in deze meting in totaal 2,35 seconden
-sneller.
+De gemiddelde totale uitvoeringstijd bedraagt 38,02 seconden voor RustProv en 35,67 seconden voor Vagrant. Hoewel RustProv de VM aanzienlijk sneller opstart, wordt deze tijdswinst in dit scenario tenietgedaan door de langere provisioningtijd. Vagrant is daardoor in deze meting in totaal 2,35 seconden sneller dan RustProv. RustProv is dus iets trager in totaal voor dit scenario met één Linux-VM.
 
 
 \section{Meting van meerdere Linux-VM's}

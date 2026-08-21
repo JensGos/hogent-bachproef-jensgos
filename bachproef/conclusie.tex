@@ -14,14 +14,11 @@
 % Heeft het onderzoek geleid tot nieuwe vragen die uitnodigen tot verder 
 %onderzoek?
 
-\chapter{Conclusie}%
-\label{ch:conclusie}
-
 Deze bachelorproef onderzocht hoe een performante provisioner voor virtuele Windows- en Linuxomgevingen kan worden ontworpen en gerealiseerd, die beter inspeelt op de behoeften van het onderwijs dan de huidige Vagrant-gebaseerde aanpak. Het resultaat van dit onderzoek is RustProv, een in Rust geschreven provisioner die virtuele machines in VirtualBox automatisch kan aanmaken, configureren, opstarten en provisionen.
 
-De experimenten tonen aan dat RustProv in de meeste scenario's sneller is dan Vagrant. Bij één Linux-VM is Vagrant in totaal 2,35 seconden sneller, omdat de langere opstarttijd van RustProv wordt gecompenseerd door een aanzienlijk kortere provisioningtijd. Bij drie Linux-VM's is RustProv gemiddeld 74,03 seconden sneller dan Vagrant. Bij één Windows-VM is RustProv in totaal 58,91 seconden sneller, voornamelijk door de lichtere configuratie tijdens het opstarten. Bij drie Windows-VM's bedraagt de tijdswinst gemiddeld 472,10 seconden, omdat RustProv de configuratie van VM's op de achtergrond uitvoert en zo wachttijden vermindert.
+De experimenten tonen aan dat RustProv in de meeste scenario's sneller is dan Vagrant. Bij één Linux-VM is Vagrant in totaal 2,35 seconden sneller, omdat de kortere opstarttijd van RustProv wordt tenietgedaan door een aanzienlijk langere provisioningtijd. Bij drie Linux-VM's is RustProv gemiddeld 74,03 seconden sneller dan Vagrant. Bij één Windows-VM is RustProv in totaal 58,91 seconden sneller, voornamelijk door de lichtere configuratie tijdens het opstarten. Bij drie Windows-VM's bedraagt de tijdswinst gemiddeld 472,10 seconden, omdat RustProv de configuratie van VM's op de achtergrond uitvoert en zo wachttijden vermindert.
 
-Deze resultaten beantwoorden de centrale onderzoeksvraag positief: het is mogelijk om een performante provisioner te ontwerpen die in specifieke scenario's sneller is dan Vagrant, vooral bij het provisionen van meerdere Windows-VM's. RustProv voldoet aan de essentiële functionaliteiten voor een onderwijsprovisioner: het ondersteunt zowel Linux als Windows, biedt configuratie via een leesbaar TOML-bestand en maakt herhaalbare experimenten mogelijk.
+Deze resultaten beantwoorden de centrale onderzoeksvraag positief: het is mogelijk om een performante provisioner te ontwerpen die in specifieke scenario's sneller is dan Vagrant, vooral bij het provisionen van meerdere VM's. RustProv voldoet aan de essentiële functionaliteiten voor een onderwijsprovisioner: het ondersteunt zowel Linux als Windows, biedt configuratie via een leesbaar TOML-bestand en maakt herhaalbare experimenten mogelijk.
 
 De belangrijkste bijdrage van dit werk is het aantonen dat een lichtgewicht, in Rust ontwikkelde provisioner concurrentievoordelen kan bieden ten opzichte van een gevestigde tool zoals Vagrant. RustProv maakt gebruik van de memory safety en performantie van Rust, terwijl het een eenvoudigere architectuur hanteert die gericht is op de kernfunctionaliteit van een provisioner.
 
