@@ -6,81 +6,239 @@
 
 \documentclass[a0,portrait]{hogent-poster}
 
+
+
+
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+
+% Aanpasbare kleuren
+\definecolor{titlecolor}{RGB}{76,162,213}
+\definecolor{bordercolor}{RGB}{76,162,213}
+\definecolor{boxbackground}{RGB}{255,255,255}
+
+\newtcolorbox{posterbox}[1]{
+    enhanced,
+    colback=boxbackground,
+    colframe=bordercolor,
+    boxrule=0.8pt,
+    arc=2mm,
+    left=3mm,
+    right=3mm,
+    top=4mm,
+    bottom=2mm,
+    title={#1},
+    coltitle=white,
+    colbacktitle=titlecolor,
+    fonttitle=\bfseries\large,
+    toptitle=1.5mm,
+    bottomtitle=1.5mm,
+    lefttitle=3mm,
+    righttitle=3mm,
+    sharp corners=north
+}
+
 % Info over de opleiding
 \course{Bachelorproef}
 \studyprogramme{toegepaste informatica}
-\academicyear{2022-2023}
+\academicyear{2025-2026}
 \institution{Hogeschool Gent, Valentin Vaerwyckweg 1, 9000 Gent}
 
 % Info over de bachelorproef
-\title{Titel van uw bachelorproef}
-\subtitle{Ondertitel (eventueel)}
-\author{Voornaam Naam}
-\email{voornaam.familienaam@student.hogent.be}
-\supervisor{Voornaam Naam}
-\cosupervisor{Voornaam Naam (Bedrijf)}
-
+\title{Ontwerp en realisatie van een performante provisioner voor virtuele Windows-en Linux omgevingen in Rust.}
+\author{Jens Gosseye}
+\email{jens.gosseye@student.hogent.be}
+\supervisor{Dhr. B. Van Vreckem}
+\cosupervisor{Dhr. J. Courtens (HOGENT)}
 % Indien ingevuld, wordt deze informatie toegevoegd aan het einde van de
 % abstract. Zet in commentaar als je dit niet wilt.
 \specialisation{Systeem- en Netwerkbeheer}
-\keywords{Lambda-calculus, Scheme}
-\projectrepo{https://github.com/user/repo}
+\keywords{Rust, Virtualbox, Windows, Linux}
+\projectrepo{https://github.com/JensGos/BP_Rust_Provision}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-It's only a model.
-You don't vote for kings. Who's that then? We found them. Ni! Ni! Ni! Ni!
-The nose? On second thoughts, let's not go there. It is a silly place. Bloody Peasant! And the hat. She's a witch! Where'd you get the coconuts?
+Deze bachelorproef onderzoekt RustProv, een provisioner in Rust voor virtuele Linux- en Windowsomgevingen. De tool automatiseert het opstarten, configureren en provisionen van één of meerdere virtuele machines via TOML-configuratie en SSH. RustProv werd vergeleken met Vagrant in Linux- en Windowsscenario's. De resultaten tonen aan dat RustProv vooral bij meerdere VM's sneller is dan Vagrant.
 \end{abstract}
 
 \begin{multicols}{2} % This is how many columns your poster will be broken into, a portrait poster is generally split into 2 columns
 
-\section{Introductie}
+\begin{posterbox}{1. Probleemstelling \& Onderzoeksvraag}
 
-Be quiet! Found them? In Mercia?! The coconut's tropical! But you are dressed as one… Well, what do you want? Knights of Ni, we are but simple travelers who seek the enchanter who lives beyond these woods.
+\textbf{Huidige situatie en Probleem} \\
+Binnen de opleiding Toegepaste Informatica aan HOGENT wordt Vagrant gebruikt om virtuele Windows- en Linuxomgevingen automatisch op te zetten. In de praktijk zorgen deze omgevingen echter regelmatig voor de volgende problemen:
 
-Well, what do you want? It's only a model. Camelot! We found them. We shall say `Ni' again to you, if you do not appease us.
+\begin{itemize}
+    \item Virtuele machines starten soms traag op.
+    \item Het provisioningproces kan vastlopen of door time-outs worden onderbroken.
+    \item Bij meerdere virtuele machines loopt de wachttijd sterk op.
+    \item Een onderbroken provisioningproces kan op de achtergrond blijven draaien.
+    \item Studenten en lectoren verliezen hierdoor tijd tijdens labo's, oefeningen en evaluaties.
+\end{itemize}
 
-The nose? Shut up! Burn her! I am your king. You don't vote for kings.
+\textbf{Onderzoeksvraag}
+\begin{quote}
+    \textit{Hoe ontwerp en realiseer je een performante provisioner voor virtuele Windows- en Linuxomgevingen die beter inspeelt op de behoeften van onderwijs- en labo-omgevingen dan de huidige Vagrant-gebaseerde aanpak?}
+\end{quote}
 
-You can't expect to wield supreme power just `cause some watery tart threw a sword at you! Well, we did do the nose. I don't want to talk to you no more, you empty-headed animal food trough water! I fart in your general direction! Your mother was a hamster and your father smelt of elderberries! Now leave before I am forced to taunt you a second time!
+\textbf{Doelstelling en Scope} \\
+RustProv is ontwikkeld als een proof of concept in Rust. De tool moet:
 
-Why do you think that she is a witch? We want a shrubbery!! I don't want to talk to you no more, you empty-headed animal food trough water! I fart in your general direction! Your mother was a hamster and your father smelt of elderberries! Now leave before I am forced to taunt you a second time!
+\begin{itemize}
+    \item Windows- en Linux-VM's kunnen opstarten en provisionen.
+    \item Eén of meerdere VM's kunnen beheren.
+    \item Configuratie uit een leesbaar TOML-bestand kunnen inlezen.
+    \item Provisioningscripts via SSH kunnen uitvoeren.
+    \item VM-statussen, snapshots en foutscenario's kunnen beheren.
+    \item De provisioningstijd ten opzichte van Vagrant kunnen verkorten.
+\end{itemize}
 
-\section{Experimenten}
+De centrale focus ligt dus niet alleen op het aanmaken van VM's, maar vooral op het volledig geautomatiseerd opstarten, bereiken en provisionen van een bruikbare omgeving.
+\end{posterbox}
 
-A newt? Camelot! Why? No, no, no! Yes, yes. A bit. But she's got a wart.
+\definecolor{titlecolor}{RGB}{65,138,181}
+\definecolor{bordercolor}{RGB}{65,138,181}
+\definecolor{boxbackground}{RGB}{255,255,255}
 
-Shut up! I dunno. Must be a king. Who's that then? Look, my liege! On second thoughts, let's not go there. It is a silly place.
+\begin{posterbox}{2. Methodologie}
+    
+\centering
+\includegraphics[
+width=\linewidth,
+keepaspectratio
+]{img/Gantt Diagram.png}
+\captionof{figure}{Gantt diagram met de verschillende fasen.}
 
-Shut up! Will you shut up?! No, no, no! Yes, yes. A bit. But she's got a wart. He hasn't got shit all over him. It's only a model. It's only a model.
+\vspace{4mm}
+\raggedright
 
-Bring her forward! I don't want to talk to you no more, you empty-headed animal food trough water! I fart in your general direction! Your mother was a hamster and your father smelt of elderberries! Now leave 
+\textbf{Rust leren \& onderzoek:}\\
+- Rust, virtualisatie en provisioning verkennen; vereisten bepalen.
 
-\section{Sectie met figuur}
+\vspace{1.5mm}
 
-De {\LaTeX} figure-omgeving bepaalt zelf waar een afbeelding komt en dat is meestal niet op de plek in de tekst waar de figure-omgeving gedefinieerd wordt. Als je wilt forceren dat afbeeldingen toch in de flow van de tekst blijven, dan kan je dat zoals hieronder:
+\textbf{Sprint 1 -- Opstarten:}\\
+- VM's aanmaken, configureren en starten in VirtualBox.
+
+\vspace{1.5mm}
+
+\textbf{Sprint 2 -- Provisionen:}\\
+- Via SSH scripts uitvoeren op Linux- en Windows-VM's.
+
+\vspace{1.5mm}
+
+\textbf{Sprint 3 -- Configuratie:}\\
+- VM-instellingen inlezen vanuit TOML.
+
+\vspace{1.5mm}
+
+\textbf{Sprint 4 -- Uitbreidingen:}\\
+- Snapshots, statuscontrole en meerdere VM's.
+
+\vspace{1.5mm}
+
+\textbf{Sprint 5 -- Robuustheid:}\\
+- Prioriteiten, foutafhandeling en noodfuncties.
+    
+\end{posterbox}
+
+
+\definecolor{titlecolor}{RGB}{53,113,149}
+\definecolor{bordercolor}{RGB}{53,113,149}
+\definecolor{boxbackground}{RGB}{255,255,255}
+
+
+\begin{posterbox}{3. Functionaliteiten}
+
+RustProv beheert virtuele machines via een command-line interface en een extern
+TOML-configuratiebestand.
+
+\vspace{0.5cm}
+
+\noindent
+\begin{minipage}[t]{0.48\columnwidth}
+    \centering
+    \scriptsize
+    \begin{verbatim}
+        Commands:
+        start      Start VM(s)
+        stop       Stop VM(s)
+        provision  Provision VM(s)
+        state      Check VM state
+        remove     Remove VM(s)
+        restore    Restore snapshot(s)
+        ssh        SSH into a VM
+        kill       Kill VirtualBox
+        init       Initialize tool
+    \end{verbatim}
+    
+    \captionof{figure}{RustProv commando's.}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.48\columnwidth}
+    \centering
+    \scriptsize
+    \begin{verbatim}
+        [linuxbp]
+        image = "almalinux9"
+        cores = 4
+        memory = 4096
+        script = ["00-hello.sh"]
+        bridgeNetwork = 
+        "Realtek Gaming 2.5GbE 
+        Family Controller"
+    \end{verbatim}
+    
+    \captionof{figure}{Voorbeeld TOML-config.}
+\end{minipage}
+\end{posterbox}
+
+
+\definecolor{titlecolor}{RGB}{42,89,117}
+\definecolor{bordercolor}{RGB}{42,89,117}
+\definecolor{boxbackground}{RGB}{255,255,255}
+
+\begin{posterbox}{4. Resultaten}
+
+RustProv werd vergeleken met Vagrant in vier testscenario's: één Linux-VM, drie Linux-VM's, één Windows-VM en drie Windows-VM's. De Linuxomgeving bestond uit een serveropstelling met onder andere WordPress, Loki en Grafana. De Windowsomgeving bestond uit een Active Directory-omgeving met twee servers en één client.
 
 \begin{center}
-  \captionsetup{type=figure}
-  \includegraphics[width=1.0\linewidth]{grail}
-  \captionof{figure}{He hasn't got shit all over him. The nose? Where'd you get the coconuts? What do you mean? We shall say `Ni' again to you, if you do not appease us}
+    \begin{tabular}{lrr}
+        \hline
+        \textbf{Scenario} & \textbf{Snellere tool} & \textbf{Tijdsverschil} \\
+        \hline
+        Eén Linux-VM & Vagrant & 2,35 s \\
+        Drie Linux-VM's & RustProv & 74,03 s \\
+        Eén Windows-VM & RustProv & 58,91 s \\
+        Drie Windows-VM's & RustProv & 472,10 s \\
+        \hline
+    \end{tabular}
 \end{center}
+\end{posterbox}
 
-Let er wel op dat dit tot problemen met bladschikking kan leiden.
+\definecolor{titlecolor}{RGB}{30,65,85}
+\definecolor{bordercolor}{RGB}{30,65,85}
+\definecolor{boxbackground}{RGB}{255,255,255}
 
-\section{Conclusies}
+\begin{posterbox}{5. Conclusie \& Toekomst}
+    
+De Proof of Concept toont aan dat RustProv virtuele Linux- en Windowsomgevingen automatisch kan opstarten en provisionen. In de meeste testscenario's was RustProv sneller dan Vagrant. De grootste tijdswinst werd gemeten bij het provisionen van meerdere VM's.
 
-Don't underestimate the Force. Oh God, my uncle. How am I ever gonna explain this? I suggest you try it again, Luke. This time, let go your conscious self and act on instinct. Don't be too proud of this technological terror you've constructed. The ability to destroy a planet is insignificant next to the power of the Force.
+De resultaten tonen aan dat RustProv vooral geschikt is voor onderwijs- en labo-omgevingen waar regelmatig dezelfde VM-opstellingen moeten worden opgebouwd. Door de TOML-configuratie en de ondersteuning voor meerdere VM's kunnen deze omgevingen reproduceerbaar worden opgezet.
 
-\section{Toekomstig onderzoek}
+\textbf{Toekomstig onderzoek \& optimalisatie:}
 
-I care. So, what do you think of her, Han? No! Alderaan is peaceful. We have no weapons. You can't possibly… I have traced the Rebel spies to her. Now she is my only link to finding their secret base.
-
-Kid, I've flown from one side of this galaxy to the other. I've seen a lot of strange stuff, but I've never seen anything to make me believe there's one all-powerful Force controlling everything. There's no mystical energy field that controls my destiny. It's all a lot of simple tricks and nonsense. You are a part of the Rebel Alliance and a traitor! Take her away! 
+\begin{itemize}
+    \item \textbf{Parallel provisionen:} onafhankelijke VM's gelijktijdig configureren om de totale uitvoeringstijd verder te verkorten.
+    \item \textbf{Uitbreiding:} provisioningscripts uitvoeren op fysieke machines, naast virtuele machines.
+    \item \textbf{Betrouwbaarheid:} logging, foutmeldingen en automatische herstelacties verder verbeteren.
+    \item \textbf{Gebruiksgemak:} een grafische interface, installatieprocedure en uitgebreidere gebruikershandleiding toevoegen.
+\end{itemize}
+\end{posterbox}
+    
 
 \end{multicols}
 \end{document}
