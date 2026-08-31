@@ -78,11 +78,22 @@ Binnen de opleiding Toegepaste Informatica aan HOGENT wordt Vagrant gebruikt om 
     \item Een onderbroken provisioningproces kan op de achtergrond blijven draaien.
     \item Studenten en lectoren verliezen hierdoor tijd tijdens labo's, oefeningen en evaluaties.
 \end{itemize}
-
 \textbf{Onderzoeksvraag}
-\begin{quote}
-    \textit{Hoe ontwerp en realiseer je een performante provisioner voor virtuele Windows- en Linuxomgevingen die beter inspeelt op de behoeften van onderwijs- en labo-omgevingen dan de huidige Vagrant-gebaseerde aanpak?}
-\end{quote}
+\begin{tcolorbox}[
+    colback=gray!10,
+    colframe=gray!50,
+    leftrule=0pt,
+    rightrule=0pt,
+    toprule=1pt,
+    bottomrule=1pt,
+    arc=0pt,
+    sharp corners,
+    left=3mm,
+    right=3mm
+]
+
+\textit{Hoe ontwerp en realiseer je een performante provisioner voor virtuele Windows- en Linuxomgevingen die beter inspeelt op de behoeften van onderwijs- en labo-omgevingen dan de huidige Vagrant-gebaseerde aanpak?}
+\end{tcolorbox}
 
 \textbf{Doelstelling en Scope} \\
 RustProv is ontwikkeld als een proof of concept in Rust. De tool moet:
@@ -206,6 +217,7 @@ TOML-configuratiebestand.
 RustProv werd vergeleken met Vagrant in vier testscenario's: één Linux-VM, drie Linux-VM's, één Windows-VM en drie Windows-VM's. De Linuxomgeving bestond uit een serveropstelling met onder andere WordPress, Loki en Grafana. De Windowsomgeving bestond uit een Active Directory-omgeving met twee servers en één client.
 
 \begin{center}
+    \renewcommand{\arraystretch}{1.4}
     \begin{tabular}{lrr}
         \hline
         \textbf{Scenario} & \textbf{Snellere tool} & \textbf{Tijdsverschil} \\
@@ -218,7 +230,6 @@ RustProv werd vergeleken met Vagrant in vier testscenario's: één Linux-VM, dri
     \end{tabular}
 \end{center}
 \end{posterbox}
-
 \definecolor{titlecolor}{RGB}{30,65,85}
 \definecolor{bordercolor}{RGB}{30,65,85}
 \definecolor{boxbackground}{RGB}{255,255,255}
